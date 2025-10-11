@@ -45,6 +45,7 @@ VkShaderModule vertex_shader_module;
 VkShaderModule fragment_shader_module;
 VkPipelineLayout pipeline_layout;
 VkPipeline pipeline;
+VkPipeline outline_pipeline;
 
 VulkanBuffer vertex_buffer;
 VulkanBuffer index_buffer;
@@ -302,7 +303,7 @@ void initialize() {
         VkPipelineRasterizationStateCreateInfo raster_info{
             .sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
             .polygonMode = VK_POLYGON_MODE_FILL,
-            .cullMode = VK_CULL_MODE_NONE,  // ИЗМЕНЕНО: отключаем culling чтобы видеть обе стороны
+            .cullMode = VK_CULL_MODE_BACK_BIT,
             .frontFace = VK_FRONT_FACE_CLOCKWISE,
             .lineWidth = 1.0f,
         };
@@ -395,6 +396,35 @@ void initialize() {
             veekay::app.running = false;
             return;
         }
+
+        // OUTLINE PIPELINE
+        VkPipelineRasterizationStateCreateInfo outline_raster_info{
+            .sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
+            .depthBiasEnable = VK_TRUE,
+            .polygonMode = VK_POLYGON_MODE_LINE,
+            .cullMode = VK_CULL_MODE_BACK_BIT,
+            .frontFace = VK_FRONT_FACE_CLOCKWISE,
+            .lineWidth = 3.0f,
+            .depthBiasConstantFactor = -1.0f,
+            .depthBiasSlopeFactor = -1.0f,
+        };
+
+        VkPipelineDepthStencilStateCreateInfo outline_depth_info{
+            .sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
+            .depthTestEnable = VK_TRUE,
+            .depthWriteEnable = VK_FALSE,
+            .depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL,
+        };
+
+        VkGraphicsPipelineCreateInfo outline_info = info;
+        outline_info.pRasterizationState = &outline_raster_info;
+        outline_info.pDepthStencilState = &outline_depth_info;
+
+        if (vkCreateGraphicsPipelines(device, nullptr, 1, &outline_info, nullptr, &outline_pipeline) != VK_SUCCESS) {
+            std::cerr << "Failed to create outline pipeline\n";
+            veekay::app.running = false;
+            return;
+        }
     }
 
     const int segments = 16;
@@ -407,7 +437,7 @@ void initialize() {
     Vector white_color = {1.0f, 1.0f, 1.0f};
     Vector blue_color = {0.0f, 0.4f, 1.0f};
 
-    // 1. БОКОВАЯ ПОВЕРХНОСТЬ
+    // ТОЛЬКО БОКОВАЯ ПОВЕРХНОСТЬ (БЕЗ КРЫШЕК)
     for (int i = 0; i < segments; ++i) {
         float angle1 = 2.0f * std::numbers::pi * i / segments;
         float angle2 = 2.0f * std::numbers::pi * (i + 1) / segments;
@@ -426,58 +456,8 @@ void initialize() {
         vertices.push_back({{x2, -height/2, z2}, blue_color});
     }
 
-    // Индексы боковой поверхности
     for (uint32_t i = 0; i < segments * 6; ++i) {
         indices.push_back(i);
-    }
-
-    // 2. ВЕРХНЯЯ КРЫШКА (белая)
-    uint32_t top_center_idx = vertices.size();
-    vertices.push_back({{0.0f, height/2, 0.0f}, white_color});
-
-    for (int i = 0; i < segments; ++i) {
-        float angle1 = 2.0f * std::numbers::pi * i / segments;
-        float angle2 = 2.0f * std::numbers::pi * (i + 1) / segments;
-
-        float x1 = cosf(angle1) * radius;
-        float z1 = sinf(angle1) * radius;
-        float x2 = cosf(angle2) * radius;
-        float z2 = sinf(angle2) * radius;
-
-        uint32_t edge1_idx = vertices.size();
-        vertices.push_back({{x1, height/2, z1}, white_color});
-
-        uint32_t edge2_idx = vertices.size();
-        vertices.push_back({{x2, height/2, z2}, white_color});
-
-        indices.push_back(top_center_idx);
-        indices.push_back(edge1_idx);
-        indices.push_back(edge2_idx);
-    }
-
-    // 3. НИЖНЯЯ КРЫШКА (синяя)
-    uint32_t bottom_center_idx = vertices.size();
-    vertices.push_back({{0.0f, -height/2, 0.0f}, blue_color});
-
-    for (int i = 0; i < segments; ++i) {
-        float angle1 = 2.0f * std::numbers::pi * i / segments;
-        float angle2 = 2.0f * std::numbers::pi * (i + 1) / segments;
-
-        float x1 = cosf(angle1) * radius;
-        float z1 = sinf(angle1) * radius;
-        float x2 = cosf(angle2) * radius;
-        float z2 = sinf(angle2) * radius;
-
-        uint32_t edge1_idx = vertices.size();
-        vertices.push_back({{x1, -height/2, z1}, blue_color});
-
-        uint32_t edge2_idx = vertices.size();
-        vertices.push_back({{x2, -height/2, z2}, blue_color});
-
-        // Нижняя крышка в обратном порядке (против часовой стрелки если смотреть снизу)
-        indices.push_back(bottom_center_idx);
-        indices.push_back(edge2_idx);
-        indices.push_back(edge1_idx);
     }
 
     vertex_buffer = createBuffer(vertices.size() * sizeof(Vertex), vertices.data(),
@@ -490,15 +470,15 @@ void shutdown() {
     VkDevice& device = veekay::app.vk_device;
     destroyBuffer(index_buffer);
     destroyBuffer(vertex_buffer);
+    vkDestroyPipeline(device, outline_pipeline, nullptr);
     vkDestroyPipeline(device, pipeline, nullptr);
     vkDestroyPipelineLayout(device, pipeline_layout, nullptr);
     vkDestroyShaderModule(device, fragment_shader_module, nullptr);
     vkDestroyShaderModule(device, vertex_shader_module, nullptr);
 }
-
-void update(double time) {
+    void update(double time) {
     ImGui::Begin("Controls:");
-    ImGui::SliderFloat("Trajectory Radius", &trajectory_radius, 1.0f, 10.0f);
+    ImGui::SliderFloat("Trajectory Size", &trajectory_radius, 1.0f, 5.0f);  // Изменил название
     ImGui::SliderFloat("Trajectory Speed", &trajectory_speed, 0.1f, 5.0f);
     ImGui::SliderFloat("Rotation Speed", &rotation_speed, 0.1f, 5.0f);
     ImGui::Checkbox("Spin (Self Rotation)", &model_spin);
@@ -519,9 +499,16 @@ void update(double time) {
 
     if (!animation_paused) {
         trajectory_angle = time * trajectory_speed * animation_direction;
-        model_position.x = cosf(trajectory_angle) * trajectory_radius;
-        model_position.y = 0.0f;
-        model_position.z = 5.0f + sinf(trajectory_angle) * trajectory_radius;
+
+        // Лемниската Бернулли (восьмёрка): x = a*cos(t) / (1 + sin²(t)), y = a*sin(t)*cos(t) / (1 + sin²(t))
+        float t = trajectory_angle;
+        float sin_t = sinf(t);
+        float cos_t = cosf(t);
+        float denominator = 1.0f + sin_t * sin_t;
+
+        model_position.x = trajectory_radius * cos_t / denominator;
+        model_position.y = trajectory_radius * sin_t * cos_t / denominator;
+        model_position.z = 5.0f;  // Фиксированная глубина перед камерой
     }
 
     if (model_spin) {
@@ -559,8 +546,6 @@ void render(VkCommandBuffer cmd, VkFramebuffer framebuffer) {
     rp.pClearValues = clears;
     vkCmdBeginRenderPass(cmd, &rp, VK_SUBPASS_CONTENTS_INLINE);
 
-    vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
-
     VkDeviceSize offset = 0;
     vkCmdBindVertexBuffers(cmd, 0, 1, &vertex_buffer.buffer, &offset);
     vkCmdBindIndexBuffer(cmd, index_buffer.buffer, 0, VK_INDEX_TYPE_UINT32);
@@ -579,17 +564,25 @@ void render(VkCommandBuffer cmd, VkFramebuffer framebuffer) {
         .color = model_color,
     };
 
+    // 1. ЗАЛИВКА
+    vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
     vkCmdPushConstants(cmd, pipeline_layout,
                        VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
                        0, sizeof(ShaderConstants), &constants);
+    vkCmdDrawIndexed(cmd, 16 * 6, 1, 0, 0, 0);  // ТОЛЬКО боковая поверхность
 
-    // Боковая поверхность (16*6) + верхняя крышка (16*3) + нижняя крышка (16*3)
-    vkCmdDrawIndexed(cmd, 16 * 6 + 16 * 3 + 16 * 3, 1, 0, 0, 0);
+    // 2. КОНТУР
+    vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, outline_pipeline);
+    ShaderConstants outline_constants = constants;
+    outline_constants.color = {0.0f, 0.0f, 0.0f};
+    vkCmdPushConstants(cmd, pipeline_layout,
+                       VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+                       0, sizeof(ShaderConstants), &outline_constants);
+    vkCmdDrawIndexed(cmd, 16 * 6, 1, 0, 0, 0);  // ТОЛЬКО боковая поверхность
 
     vkCmdEndRenderPass(cmd);
     vkEndCommandBuffer(cmd);
 }
-
 
 } // namespace
 

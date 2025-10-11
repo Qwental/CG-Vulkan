@@ -14,6 +14,10 @@ layout (push_constant, std430) uniform ShaderConstants {
 };
 
 void main() {
-    // ИЗМЕНЕНО: используем интерполированный цвет из вершин вместо uniform
-    final_color = vec4(frag_color, 1.0f);
+   // ИЗМЕНЕНО: используем интерполированный цвет из вершин вместо uniform
+   if (color.r < 0.01 && color.g < 0.01 && color.b < 0.01) {
+           final_color = vec4(0.0, 0.0, 0.0, 1.0);
+   } else {
+           final_color = vec4(frag_color, 1.0);
+   }
 }
