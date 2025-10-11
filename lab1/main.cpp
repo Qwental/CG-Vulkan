@@ -27,6 +27,7 @@ struct Vector {
 
 struct Vertex {
 	Vector position;
+	Vector color;
 	// NOTE: You can add more attributes
 };
 
@@ -51,7 +52,7 @@ VkPipeline pipeline;
 VulkanBuffer vertex_buffer;
 VulkanBuffer index_buffer;
 
-Vector model_position = {0.0f, 0.0f, 5.0f};
+Vector model_position = {0.0f, 0.0f, 0.0f};
 float model_rotation;
 Vector model_color = {0.5f, 1.0f, 0.7f };
 bool model_spin = true;
@@ -350,6 +351,13 @@ fragment_shader_module = loadShaderModule("./shaders/shader.frag.spv");
 				.format = VK_FORMAT_R32G32B32_SFLOAT, // NOTE: 3-component vector of floats
 				.offset = offsetof(Vertex, position), // NOTE: Offset of "position" field in a Vertex struct
 			},
+				{
+					.location = 1, // NOTE: Second attribute - color
+					.binding = 0,
+					.format = VK_FORMAT_R32G32B32_SFLOAT,
+					.offset = offsetof(Vertex, color),
+				},
+
 			// NOTE: If you want more attributes per vertex, declare them here
 #if 0
 			{
@@ -506,6 +514,7 @@ fragment_shader_module = loadShaderModule("./shaders/shader.frag.spv");
 	std::vector<uint32_t> indices;
 
 	// Генерация боковой поверхности цилиндра
+	// Генерация боковой поверхности цилиндра
 	for (int i = 0; i < segments; ++i) {
 		float angle1 = 2.0f * std::numbers::pi * i / segments;
 		float angle2 = 2.0f * std::numbers::pi * (i + 1) / segments;
@@ -516,17 +525,21 @@ fragment_shader_module = loadShaderModule("./shaders/shader.frag.spv");
 		float x2 = cosf(angle2) * radius;
 		float z2 = sinf(angle2) * radius;
 
-		// Четыре вершины для двух треугольников
+		// Белый цвет для верхних вершин, синий для нижних
+		Vector white_color = {1.0f, 1.0f, 1.0f};  // Белый
+		Vector blue_color = {0.0f, 0.4f, 1.0f};   // Синий
+
 		// Первый треугольник: bottom1 -> top1 -> bottom2
-		vertices.push_back({{x1, -height/2, z1}}); // bottom1
-		vertices.push_back({{x1, height/2, z1}});  // top1
-		vertices.push_back({{x2, -height/2, z2}}); // bottom2
+		vertices.push_back({{x1, -height/2, z1}, blue_color});  // bottom1 - синий
+		vertices.push_back({{x1, height/2, z1}, white_color});  // top1 - белый
+		vertices.push_back({{x2, -height/2, z2}, blue_color});  // bottom2 - синий
 
 		// Второй треугольник: top1 -> top2 -> bottom2
-		vertices.push_back({{x1, height/2, z1}});  // top1
-		vertices.push_back({{x2, height/2, z2}});  // top2
-		vertices.push_back({{x2, -height/2, z2}}); // bottom2
+		vertices.push_back({{x1, height/2, z1}, white_color});  // top1 - белый
+		vertices.push_back({{x2, height/2, z2}, white_color});  // top2 - белый
+		vertices.push_back({{x2, -height/2, z2}, blue_color});  // bottom2 - синий
 	}
+
 
 	// Создаем индексы (0, 1, 2, 3, 4, 5, ...)
 	for (uint32_t i = 0; i < segments * 6; ++i) {
@@ -588,7 +601,11 @@ void shutdown() {
 		trajectory_angle = time * trajectory_speed * animation_direction;
 
 		// Движение по кругу вокруг центра сцены (0,0,0)
+		// model_position.x = cosf(trajectory_angle) * trajectory_radius;
+		// model_position.z = sinf(trajectory_angle) * trajectory_radius;
+
 		model_position.x = cosf(trajectory_angle) * trajectory_radius;
+		model_position.y = 0.0f;  // Держим на уровне Y=0
 		model_position.z = sinf(trajectory_angle) * trajectory_radius;
 	}
 
@@ -604,77 +621,83 @@ void shutdown() {
 }
 
 void render(VkCommandBuffer cmd, VkFramebuffer framebuffer) {
-	vkResetCommandBuffer(cmd, 0);
+    vkResetCommandBuffer(cmd, 0);
 
-	{ // NOTE: Start recording rendering commands
-		VkCommandBufferBeginInfo info{
-			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-			.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT,
-		};
+    // Начало записи команд
+    VkCommandBufferBeginInfo begin{ VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO };
+    begin.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+    vkBeginCommandBuffer(cmd, &begin);
 
-		vkBeginCommandBuffer(cmd, &info);
-	}
+    // Получаем размеры кадра в пикселях (HiDPI/Retina)
+    ImVec2 fbScale = ImGui::GetIO().DisplayFramebufferScale;
+    if (fbScale.x <= 0.0f) fbScale.x = 1.0f;
+    if (fbScale.y <= 0.0f) fbScale.y = 1.0f;
 
-	{ // NOTE: Use current swapchain framebuffer and clear it
-		VkClearValue clear_color{.color = {{0.1f, 0.1f, 0.1f, 1.0f}}};
-		VkClearValue clear_depth{.depthStencil = {1.0f, 0}};
+    const uint32_t fbw = static_cast<uint32_t>(std::round(veekay::app.window_width  * fbScale.x));
+    const uint32_t fbh = static_cast<uint32_t>(std::round(veekay::app.window_height * fbScale.y));
 
-		VkClearValue clear_values[] = {clear_color, clear_depth};
+    // Начинаем рендер-проход с очисткой на весь framebuffer
+    VkClearValue clear_color{ .color = {{0.1f, 0.1f, 0.1f, 1.0f}} };
+    VkClearValue clear_depth{ .depthStencil = {1.0f, 0} };
+    VkClearValue clears[] = { clear_color, clear_depth };
 
-		VkRenderPassBeginInfo info{
-			.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
-			.renderPass = veekay::app.vk_render_pass,
-			.framebuffer = framebuffer,
-			.renderArea = {
-				.extent = {
-					veekay::app.window_width,
-					veekay::app.window_height
-				},
-			},
-			.clearValueCount = 2,
-			.pClearValues = clear_values,
-		};
+    VkRenderPassBeginInfo rp{ VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO };
+    rp.renderPass  = veekay::app.vk_render_pass;
+    rp.framebuffer = framebuffer;
+    rp.renderArea.offset = {0, 0};
+    rp.renderArea.extent = { fbw, fbh };
+    rp.clearValueCount = 2;
+    rp.pClearValues    = clears;
+    vkCmdBeginRenderPass(cmd, &rp, VK_SUBPASS_CONTENTS_INLINE);
 
-		vkCmdBeginRenderPass(cmd, &info, VK_SUBPASS_CONTENTS_INLINE);
-	}
+    // Пайплайн
+    vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
 
-	// TODO: Vulkan rendering code here
-	// NOTE: ShaderConstant updates, vkCmdXXX expected to be here
-	{
-		// NOTE: Use our new shiny graphics pipeline
-		vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
+    // Динамический viewport/scissor по размерам framebuffer
+    VkViewport vp{};
+    vp.x = 0.0f; vp.y = 0.0f;
+    vp.width  = static_cast<float>(fbw);
+    vp.height = static_cast<float>(fbh);
+    vp.minDepth = 0.0f; vp.maxDepth = 1.0f;
+    // vkCmdSetViewport(cmd, 0, 1, &vp);
+
+    VkRect2D sc{};
+    sc.offset = {0, 0};
+    sc.extent = { fbw, fbh };
+    // vkCmdSetScissor(cmd, 0, 1, &sc);
+
+    // Буферы
+    VkDeviceSize offset = 0;
+    vkCmdBindVertexBuffers(cmd, 0, 1, &vertex_buffer.buffer, &offset);
+    vkCmdBindIndexBuffer(cmd, index_buffer.buffer, 0, VK_INDEX_TYPE_UINT32);
+
+	// Матрицы и цвет
+	ShaderConstants constants{
+		.projection = projection(
+			camera_fov,                                              // Используем перспективу
+			static_cast<float>(fbw) / static_cast<float>(fbh),      // aspect ratio
+			camera_near_plane,
+			camera_far_plane
+		),
+		.transform = multiply(
+			multiply(rotation({0.0f, 1.0f, 0.0f}, model_rotation),      // Вращение вокруг Y
+					 rotation({1.0f, 0.0f, 0.0f}, -0.3f)),              // Небольшой наклон
+			translation({0.0f, 0.0f, -8.0f}) // Отодвигаем дальше
+		),
+		.color = model_color,
+	};
 
 
-		// NOTE: Use our quad vertex buffer
-		VkDeviceSize offset = 0;
-		vkCmdBindVertexBuffers(cmd, 0, 1, &vertex_buffer.buffer, &offset);
+    vkCmdPushConstants(cmd, pipeline_layout,
+                       VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+                       0, sizeof(ShaderConstants), &constants);
 
-		// NOTE: Use our quad index buffer
-		vkCmdBindIndexBuffer(cmd, index_buffer.buffer, offset, VK_INDEX_TYPE_UINT32);
+    // Рисуем цилиндр
+    vkCmdDrawIndexed(cmd, 8 * 6, 1, 0, 0, 0);
 
-		// NOTE: Variables like model_XXX were declared globally
-		ShaderConstants constants{
-			.projection = orthographic(
-			-5.0f, 5.0f,    // left, right
-		-5.0f, 5.0f,    // bottom, top
-		camera_near_plane, camera_far_plane),
-
-			.transform = multiply(multiply(rotation({0.0f, 1.0f, 0.0f}, model_rotation),
-								  rotation({1.0f, 0.0f, 0.0f}, -0.5f)), translation(model_position)),
-
-			.color = model_color,
-		};
-
-		// NOTE: Update constant memory with new shader constants
-		vkCmdPushConstants(cmd, pipeline_layout,
-		                   VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
-		                   0, sizeof(ShaderConstants), &constants);
-
-		vkCmdDrawIndexed(cmd, 8 * 6, 1, 0, 0, 0);
-	}
-
-	vkCmdEndRenderPass(cmd);
-	vkEndCommandBuffer(cmd);
+    // Завершаем
+    vkCmdEndRenderPass(cmd);
+    vkEndCommandBuffer(cmd);
 }
 
 } // namespace

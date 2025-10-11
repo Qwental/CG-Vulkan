@@ -19,8 +19,9 @@
 
 namespace {
 
-constexpr uint32_t window_default_width = 1280;
-constexpr uint32_t window_default_height = 720;
+constexpr uint32_t window_default_width = 1200;
+constexpr uint32_t window_default_height = 700;
+
 constexpr char window_title[] = "Veekay";
 
 constexpr uint32_t max_frames_in_flight = 2;
@@ -82,13 +83,20 @@ int veekay::run(const veekay::ApplicationInfo& app_info) {
 
 	window = glfwCreateWindow(window_default_width, window_default_height,
 	                          window_title, nullptr, nullptr);
+
+
+
 	if (!window) {
 		std::cerr << "Failed to create GLFW window\n";
 		return 1;
 	}
 
-	veekay::app.window_width = window_default_width;
-	veekay::app.window_height = window_default_height;
+	int fb_width, fb_height;
+	glfwGetFramebufferSize(window, &fb_width, &fb_height);
+
+	// 1.3. Сохраните их в ваше приложение (если нужно)
+	veekay::app.window_width  = static_cast<uint32_t>(fb_width);
+	veekay::app.window_height = static_cast<uint32_t>(fb_height);
 
 	{ // NOTE: Initialize Vulkan: grab device and create swapchain
 		vkb::InstanceBuilder instance_builder;
@@ -155,9 +163,16 @@ int veekay::run(const veekay::ApplicationInfo& app_info) {
 			.colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR,
 		};
 
+		// auto swapchain_result = swapchain_builder.set_desired_format(surface_format)
+		//                                          .set_desired_present_mode(VK_PRESENT_MODE_FIFO_KHR)
+		//                                          .set_desired_extent(window_default_width, window_default_height)
+		//                                          .add_image_usage_flags(VK_IMAGE_USAGE_TRANSFER_DST_BIT)
+		//                                          .build();
+
+
 		auto swapchain_result = swapchain_builder.set_desired_format(surface_format)
 		                                         .set_desired_present_mode(VK_PRESENT_MODE_FIFO_KHR)
-		                                         .set_desired_extent(window_default_width, window_default_height)
+		.set_desired_extent(fb_width, fb_height)
 		                                         .add_image_usage_flags(VK_IMAGE_USAGE_TRANSFER_DST_BIT)
 		                                         .build();
 
@@ -261,8 +276,8 @@ int veekay::run(const veekay::ApplicationInfo& app_info) {
 				.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
 				.renderPass = imgui_render_pass,
 				.attachmentCount = 1,
-				.width = window_default_width,
-				.height = window_default_height,
+				.width = static_cast<uint32_t>(fb_width),
+				.height = static_cast<uint32_t>(fb_height),
 				.layers = 1,
 			};
 
@@ -352,7 +367,7 @@ int veekay::run(const veekay::ApplicationInfo& app_info) {
 			.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
 			.imageType = VK_IMAGE_TYPE_2D,
 			.format = vk_image_depth_format,
-			.extent = {window_default_width, window_default_height, 1},
+			.extent = {static_cast<uint32_t>(fb_width), static_cast<uint32_t>(fb_height), 1},
 			.mipLevels = 1,
 			.arrayLayers = 1,
 			.samples = VK_SAMPLE_COUNT_1_BIT,
@@ -440,7 +455,7 @@ int veekay::run(const veekay::ApplicationInfo& app_info) {
 			.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
 
 			.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-			.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+			.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
 		};
 
 		VkAttachmentDescription depth_attachment{
@@ -516,8 +531,8 @@ int veekay::run(const veekay::ApplicationInfo& app_info) {
 			.attachmentCount = 2,
 			.pAttachments = attachments,
 
-			.width = window_default_width,
-			.height = window_default_height,
+			.width = static_cast<uint32_t>(fb_width),
+			.height = static_cast<uint32_t>(fb_height),
 			.layers = 1,
 		};
 
