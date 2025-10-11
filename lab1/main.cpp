@@ -49,7 +49,7 @@ VkPipeline pipeline;
 VulkanBuffer vertex_buffer;
 VulkanBuffer index_buffer;
 
-Vector model_position = {0.0f, 0.0f, 5.0f};  // ИЗМЕНЕНО: начальная позиция как в рабочем коде
+Vector model_position = {0.0f, 0.0f, 5.0f};
 float model_rotation;
 Vector model_color = {0.5f, 1.0f, 0.7f};
 bool model_spin = true;
@@ -302,7 +302,7 @@ void initialize() {
         VkPipelineRasterizationStateCreateInfo raster_info{
             .sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
             .polygonMode = VK_POLYGON_MODE_FILL,
-            .cullMode = VK_CULL_MODE_BACK_BIT,
+            .cullMode = VK_CULL_MODE_NONE,  // ИЗМЕНЕНО: отключаем culling чтобы видеть обе стороны
             .frontFace = VK_FRONT_FACE_CLOCKWISE,
             .lineWidth = 1.0f,
         };
@@ -397,13 +397,17 @@ void initialize() {
         }
     }
 
-    const int segments = 8;
+    const int segments = 16;
     const float height = 2.0f;
     const float radius = 0.5f;
 
     std::vector<Vertex> vertices;
     std::vector<uint32_t> indices;
 
+    Vector white_color = {1.0f, 1.0f, 1.0f};
+    Vector blue_color = {0.0f, 0.4f, 1.0f};
+
+    // 1. БОКОВАЯ ПОВЕРХНОСТЬ
     for (int i = 0; i < segments; ++i) {
         float angle1 = 2.0f * std::numbers::pi * i / segments;
         float angle2 = 2.0f * std::numbers::pi * (i + 1) / segments;
@@ -412,9 +416,6 @@ void initialize() {
         float z1 = sinf(angle1) * radius;
         float x2 = cosf(angle2) * radius;
         float z2 = sinf(angle2) * radius;
-
-        Vector white_color = {1.0f, 1.0f, 1.0f};
-        Vector blue_color = {0.0f, 0.4f, 1.0f};
 
         vertices.push_back({{x1, -height/2, z1}, blue_color});
         vertices.push_back({{x1, height/2, z1}, white_color});
@@ -425,8 +426,58 @@ void initialize() {
         vertices.push_back({{x2, -height/2, z2}, blue_color});
     }
 
+    // Индексы боковой поверхности
     for (uint32_t i = 0; i < segments * 6; ++i) {
         indices.push_back(i);
+    }
+
+    // 2. ВЕРХНЯЯ КРЫШКА (белая)
+    uint32_t top_center_idx = vertices.size();
+    vertices.push_back({{0.0f, height/2, 0.0f}, white_color});
+
+    for (int i = 0; i < segments; ++i) {
+        float angle1 = 2.0f * std::numbers::pi * i / segments;
+        float angle2 = 2.0f * std::numbers::pi * (i + 1) / segments;
+
+        float x1 = cosf(angle1) * radius;
+        float z1 = sinf(angle1) * radius;
+        float x2 = cosf(angle2) * radius;
+        float z2 = sinf(angle2) * radius;
+
+        uint32_t edge1_idx = vertices.size();
+        vertices.push_back({{x1, height/2, z1}, white_color});
+
+        uint32_t edge2_idx = vertices.size();
+        vertices.push_back({{x2, height/2, z2}, white_color});
+
+        indices.push_back(top_center_idx);
+        indices.push_back(edge1_idx);
+        indices.push_back(edge2_idx);
+    }
+
+    // 3. НИЖНЯЯ КРЫШКА (синяя)
+    uint32_t bottom_center_idx = vertices.size();
+    vertices.push_back({{0.0f, -height/2, 0.0f}, blue_color});
+
+    for (int i = 0; i < segments; ++i) {
+        float angle1 = 2.0f * std::numbers::pi * i / segments;
+        float angle2 = 2.0f * std::numbers::pi * (i + 1) / segments;
+
+        float x1 = cosf(angle1) * radius;
+        float z1 = sinf(angle1) * radius;
+        float x2 = cosf(angle2) * radius;
+        float z2 = sinf(angle2) * radius;
+
+        uint32_t edge1_idx = vertices.size();
+        vertices.push_back({{x1, -height/2, z1}, blue_color});
+
+        uint32_t edge2_idx = vertices.size();
+        vertices.push_back({{x2, -height/2, z2}, blue_color});
+
+        // Нижняя крышка в обратном порядке (против часовой стрелки если смотреть снизу)
+        indices.push_back(bottom_center_idx);
+        indices.push_back(edge2_idx);
+        indices.push_back(edge1_idx);
     }
 
     vertex_buffer = createBuffer(vertices.size() * sizeof(Vertex), vertices.data(),
@@ -470,7 +521,7 @@ void update(double time) {
         trajectory_angle = time * trajectory_speed * animation_direction;
         model_position.x = cosf(trajectory_angle) * trajectory_radius;
         model_position.y = 0.0f;
-        model_position.z = 5.0f + sinf(trajectory_angle) * trajectory_radius;  // ИЗМЕНЕНО: 5.0f базовая позиция
+        model_position.z = 5.0f + sinf(trajectory_angle) * trajectory_radius;
     }
 
     if (model_spin) {
@@ -514,11 +565,10 @@ void render(VkCommandBuffer cmd, VkFramebuffer framebuffer) {
     vkCmdBindVertexBuffers(cmd, 0, 1, &vertex_buffer.buffer, &offset);
     vkCmdBindIndexBuffer(cmd, index_buffer.buffer, 0, VK_INDEX_TYPE_UINT32);
 
-    // ИЗМЕНЕНО: используем ортографическую проекцию и правильный transform
     ShaderConstants constants{
         .projection = orthographic(
-            -5.0f, 5.0f,    // left, right
-            -5.0f, 5.0f,    // bottom, top
+            -5.0f, 5.0f,
+            -5.0f, 5.0f,
             camera_near_plane, camera_far_plane
         ),
         .transform = multiply(
@@ -533,11 +583,13 @@ void render(VkCommandBuffer cmd, VkFramebuffer framebuffer) {
                        VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
                        0, sizeof(ShaderConstants), &constants);
 
-    vkCmdDrawIndexed(cmd, 8 * 6, 1, 0, 0, 0);
+    // Боковая поверхность (16*6) + верхняя крышка (16*3) + нижняя крышка (16*3)
+    vkCmdDrawIndexed(cmd, 16 * 6 + 16 * 3 + 16 * 3, 1, 0, 0, 0);
 
     vkCmdEndRenderPass(cmd);
     vkEndCommandBuffer(cmd);
 }
+
 
 } // namespace
 
