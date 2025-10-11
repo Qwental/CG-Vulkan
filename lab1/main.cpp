@@ -62,6 +62,9 @@ bool animation_reversed = false;
 float animation_direction = 1.0f;
 float rotation_speed = 1.0f;
 
+// ДОБАВЛЕНО: переключение проекции
+bool use_perspective = false;  // По умолчанию ортографическая
+
 Matrix identity() {
     Matrix result{};
     result.m[0][0] = 1.0f;
@@ -303,7 +306,7 @@ void initialize() {
         VkPipelineRasterizationStateCreateInfo raster_info{
             .sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
             .polygonMode = VK_POLYGON_MODE_FILL,
-            .cullMode = VK_CULL_MODE_BACK_BIT,
+            .cullMode = VK_CULL_MODE_NONE,  // было VK_CULL_MODE_BACK_BIT
             .frontFace = VK_FRONT_FACE_CLOCKWISE,
             .lineWidth = 1.0f,
         };
@@ -397,12 +400,11 @@ void initialize() {
             return;
         }
 
-        // OUTLINE PIPELINE
         VkPipelineRasterizationStateCreateInfo outline_raster_info{
             .sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
             .depthBiasEnable = VK_TRUE,
             .polygonMode = VK_POLYGON_MODE_LINE,
-            .cullMode = VK_CULL_MODE_BACK_BIT,
+            .cullMode = VK_CULL_MODE_NONE,  // было VK_CULL_MODE_BACK_BIT
             .frontFace = VK_FRONT_FACE_CLOCKWISE,
             .lineWidth = 3.0f,
             .depthBiasConstantFactor = -1.0f,
@@ -437,7 +439,6 @@ void initialize() {
     Vector white_color = {1.0f, 1.0f, 1.0f};
     Vector blue_color = {0.0f, 0.4f, 1.0f};
 
-    // ТОЛЬКО БОКОВАЯ ПОВЕРХНОСТЬ (БЕЗ КРЫШЕК)
     for (int i = 0; i < segments; ++i) {
         float angle1 = 2.0f * std::numbers::pi * i / segments;
         float angle2 = 2.0f * std::numbers::pi * (i + 1) / segments;
@@ -476,9 +477,22 @@ void shutdown() {
     vkDestroyShaderModule(device, fragment_shader_module, nullptr);
     vkDestroyShaderModule(device, vertex_shader_module, nullptr);
 }
-    void update(double time) {
+
+void update(double time) {
     ImGui::Begin("Controls:");
-    ImGui::SliderFloat("Trajectory Size", &trajectory_radius, 1.0f, 5.0f);  // Изменил название
+
+    // ДОБАВЛЕНО: переключатель проекции
+    ImGui::SeparatorText("Projection");
+    if (ImGui::RadioButton("Orthographic", !use_perspective)) {
+        use_perspective = false;
+    }
+    ImGui::SameLine();
+    if (ImGui::RadioButton("Perspective", use_perspective)) {
+        use_perspective = true;
+    }
+
+    ImGui::SeparatorText("Animation");
+    ImGui::SliderFloat("Trajectory Size", &trajectory_radius, 1.0f, 5.0f);
     ImGui::SliderFloat("Trajectory Speed", &trajectory_speed, 0.1f, 5.0f);
     ImGui::SliderFloat("Rotation Speed", &rotation_speed, 0.1f, 5.0f);
     ImGui::Checkbox("Spin (Self Rotation)", &model_spin);
@@ -491,6 +505,8 @@ void shutdown() {
         animation_direction = animation_reversed ? -1.0f : 1.0f;
     }
 
+    ImGui::SeparatorText("Status");
+    ImGui::Text("Projection: %s", use_perspective ? "PERSPECTIVE" : "ORTHOGRAPHIC");
     ImGui::Text("Orbit: %s %s",
                 animation_paused ? "PAUSED" : "RUNNING",
                 animation_reversed ? "(REVERSED)" : "(NORMAL)");
@@ -500,7 +516,6 @@ void shutdown() {
     if (!animation_paused) {
         trajectory_angle = time * trajectory_speed * animation_direction;
 
-        // Лемниската Бернулли (восьмёрка): x = a*cos(t) / (1 + sin²(t)), y = a*sin(t)*cos(t) / (1 + sin²(t))
         float t = trajectory_angle;
         float sin_t = sinf(t);
         float cos_t = cosf(t);
@@ -508,7 +523,7 @@ void shutdown() {
 
         model_position.x = trajectory_radius * cos_t / denominator;
         model_position.y = trajectory_radius * sin_t * cos_t / denominator;
-        model_position.z = 5.0f;  // Фиксированная глубина перед камерой
+        model_position.z = 5.0f;
     }
 
     if (model_spin) {
@@ -550,12 +565,19 @@ void render(VkCommandBuffer cmd, VkFramebuffer framebuffer) {
     vkCmdBindVertexBuffers(cmd, 0, 1, &vertex_buffer.buffer, &offset);
     vkCmdBindIndexBuffer(cmd, index_buffer.buffer, 0, VK_INDEX_TYPE_UINT32);
 
+    // ИЗМЕНЕНО: выбор проекции в зависимости от флага
+    Matrix proj_matrix;
+    if (use_perspective) {
+        // Перспективная проекция
+        float aspect_ratio = static_cast<float>(fbw) / static_cast<float>(fbh);
+        proj_matrix = projection(camera_fov, aspect_ratio, camera_near_plane, camera_far_plane);
+    } else {
+        // Ортографическая проекция
+        proj_matrix = orthographic(-5.0f, 5.0f, -5.0f, 5.0f, camera_near_plane, camera_far_plane);
+    }
+
     ShaderConstants constants{
-        .projection = orthographic(
-            -5.0f, 5.0f,
-            -5.0f, 5.0f,
-            camera_near_plane, camera_far_plane
-        ),
+        .projection = proj_matrix,
         .transform = multiply(
             multiply(rotation({0.0f, 1.0f, 0.0f}, model_rotation),
                      rotation({1.0f, 0.0f, 0.0f}, -0.5f)),
@@ -564,21 +586,19 @@ void render(VkCommandBuffer cmd, VkFramebuffer framebuffer) {
         .color = model_color,
     };
 
-    // 1. ЗАЛИВКА
     vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
     vkCmdPushConstants(cmd, pipeline_layout,
                        VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
                        0, sizeof(ShaderConstants), &constants);
-    vkCmdDrawIndexed(cmd, 16 * 6, 1, 0, 0, 0);  // ТОЛЬКО боковая поверхность
+    vkCmdDrawIndexed(cmd, 16 * 6, 1, 0, 0, 0);
 
-    // 2. КОНТУР
     vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, outline_pipeline);
     ShaderConstants outline_constants = constants;
     outline_constants.color = {0.0f, 0.0f, 0.0f};
     vkCmdPushConstants(cmd, pipeline_layout,
                        VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
                        0, sizeof(ShaderConstants), &outline_constants);
-    vkCmdDrawIndexed(cmd, 16 * 6, 1, 0, 0, 0);  // ТОЛЬКО боковая поверхность
+    vkCmdDrawIndexed(cmd, 16 * 6, 1, 0, 0, 0);
 
     vkCmdEndRenderPass(cmd);
     vkEndCommandBuffer(cmd);
