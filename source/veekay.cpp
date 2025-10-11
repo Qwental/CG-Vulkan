@@ -5,7 +5,7 @@
 #include <vector>
 
 #include <vulkan/vulkan_core.h>
-
+// sourse/veekay.cpp
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
@@ -71,7 +71,7 @@ veekay::Application veekay::app;
 
 int veekay::run(const veekay::ApplicationInfo& app_info) {
 	veekay::app.running = true;
-	
+
 	if (!glfwInit()) {
 		std::cerr << "Failed to initialize GLFW\n";
 		return 1;
@@ -141,7 +141,7 @@ int veekay::run(const veekay::ApplicationInfo& app_info) {
 			vk_physical_device = device.physical_device;
 
 			auto queue_type = vkb::QueueType::graphics;
-			
+
 			vk_graphics_queue = device.get_queue(queue_type).value();
 			vk_graphics_queue_family = device.get_queue_index(queue_type).value();
 		}
@@ -571,7 +571,7 @@ int veekay::run(const veekay::ApplicationInfo& app_info) {
 
 	{ // NOTE: Allocate command buffers
 		vk_command_buffers.resize(vk_framebuffers.size());
-		
+
 		VkCommandBufferAllocateInfo info{
 			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
 			.commandPool = vk_command_pool,
@@ -694,7 +694,7 @@ int veekay::run(const veekay::ApplicationInfo& app_info) {
 		vkDestroySemaphore(vk_device, vk_render_semaphores[i], nullptr);
 		vkDestroyFence(vk_device, vk_in_flight_fences[i], nullptr);
 	}
-	
+
 	vkDestroyRenderPass(vk_device, vk_render_pass, nullptr);
 
 	vkDestroyImageView(vk_device, vk_image_depth_view, nullptr);
@@ -715,7 +715,7 @@ int veekay::run(const veekay::ApplicationInfo& app_info) {
 	ImGui::DestroyContext();
 
 	vkDestroyDescriptorPool(vk_device, imgui_descriptor_pool, nullptr);
-	
+
 	vkDestroySwapchainKHR(vk_device, vk_swapchain, nullptr);
 	vkDestroyDevice(vk_device, nullptr);
 	vkDestroySurfaceKHR(vk_instance, vk_surface, nullptr);
@@ -724,6 +724,6 @@ int veekay::run(const veekay::ApplicationInfo& app_info) {
 
 	glfwDestroyWindow(window);
 	glfwTerminate();
-	
+
 	return 0;
 }
