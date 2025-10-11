@@ -213,7 +213,7 @@ int veekay::run(const veekay::ApplicationInfo& app_info) {
 				.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
 				.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
 				.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
-				.initialLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+				.initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
 				.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
 			};
 
@@ -229,13 +229,16 @@ int veekay::run(const veekay::ApplicationInfo& app_info) {
 			};
 
 			VkSubpassDependency dependency{
-				.srcSubpass = VK_SUBPASS_EXTERNAL,
-				.dstSubpass = 0,
-				.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-				.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-				.srcAccessMask = 0,
-				.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
-			};
+				.srcSubpass    = VK_SUBPASS_EXTERNAL,
+				.dstSubpass    = 0,
+				.srcStageMask  = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,            // сцена завершила запись
+				.dstStageMask  = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,            // ImGui начнёт здесь
+				.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,                     // была запись сцены
+				.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT |                     // loadOp читает
+								 VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,                     // и пишет UI
+				.dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT,
+			  };
+
 
 			VkRenderPassCreateInfo info{
 				.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
@@ -437,7 +440,7 @@ int veekay::run(const veekay::ApplicationInfo& app_info) {
 			.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
 
 			.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-			.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+			.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
 		};
 
 		VkAttachmentDescription depth_attachment{

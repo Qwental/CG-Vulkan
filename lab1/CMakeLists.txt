@@ -29,8 +29,8 @@ if(GLSLC_FOUND)
 		set(_SHADER_BINARIES "${_SHADER_BINARIES}" PARENT_SCOPE)
 	endfunction()
 
-	compile_shader(cylinder.vert)
-	compile_shader(cylinder.frag)
+	compile_shader(shader.vert)
+	compile_shader(shader.frag)
 
 	add_custom_target(${PROJECT_NAME}_shaders DEPENDS ${_SHADER_BINARIES})
 	add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_shaders)

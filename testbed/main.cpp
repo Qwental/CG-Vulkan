@@ -3,15 +3,13 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <numbers>
 #include <cmath>
 
 #include <veekay/veekay.hpp>
 
 #include <imgui.h>
 #include <vulkan/vulkan_core.h>
-
-// testbed/main.cpp
-
 
 namespace {
 
@@ -57,6 +55,13 @@ Vector model_position = {0.0f, 0.0f, 5.0f};
 float model_rotation;
 Vector model_color = {0.5f, 1.0f, 0.7f };
 bool model_spin = true;
+	float trajectory_radius = 3.0f;
+	float trajectory_speed = 1.0f;
+	float trajectory_angle = 0.0f;
+	bool animation_paused = false;
+	bool animation_reversed = false;
+	float animation_direction = 1.0f;
+	float rotation_speed = 1.0f;
 
 Matrix identity() {
 	Matrix result{};
@@ -65,14 +70,14 @@ Matrix identity() {
 	result.m[1][1] = 1.0f;
 	result.m[2][2] = 1.0f;
 	result.m[3][3] = 1.0f;
-	
+
 	return result;
 }
 
 Matrix projection(float fov, float aspect_ratio, float near, float far) {
 	Matrix result{};
 
-	const float radians = fov * M_PI / 180.0f;
+	const float radians = fov * std::numbers::pi / 180.0f;
 	const float cot = 1.0f / tanf(radians / 2.0f);
 
 	result.m[0][0] = cot / aspect_ratio;
@@ -93,6 +98,20 @@ Matrix translation(Vector vector) {
 	result.m[3][2] = vector.z;
 
 	return result;
+}
+
+	Matrix orthographic(float left, float right, float bottom, float top, float near, float far) {
+		Matrix result = identity();
+
+		result.m[0][0] = 2.0f / (right - left);
+		result.m[1][1] = 2.0f / (top - bottom);
+		result.m[2][2] = 1.0f / (far - near);
+
+		result.m[3][0] = -(right + left) / (right - left);
+		result.m[3][1] = -(top + bottom) / (top - bottom);
+		result.m[3][2] = -near / (far - near);
+
+		return result;
 }
 
 Matrix rotation(Vector axis, float angle) {
@@ -141,33 +160,53 @@ Matrix multiply(const Matrix& a, const Matrix& b) {
 
 // NOTE: Loads shader byte code from file
 // NOTE: Your shaders are compiled via CMake with this code too, look it up
-VkShaderModule loadShaderModule(const char* path) {
+	VkShaderModule loadShaderModule(const char* path) {
+	// 1) Открытие файла
 	std::ifstream file(path, std::ios::binary | std::ios::ate);
-	size_t size = file.tellg();
-	std::vector<uint32_t> buffer(size / sizeof(uint32_t));
-	file.seekg(0);
-	file.read(reinterpret_cast<char*>(buffer.data()), size);
-	file.close();
-
-	VkShaderModuleCreateInfo info{
-		.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
-		.codeSize = size,
-		.pCode = buffer.data(),
-	};
-
-	VkShaderModule result;
-	if (vkCreateShaderModule(veekay::app.vk_device, &
-	                         info, nullptr, &result) != VK_SUCCESS) {
-		return nullptr;
+	if (!file.is_open()) {
+		std::cerr << "Shader open failed: " << path << "\n";
+		return VK_NULL_HANDLE;
 	}
 
-	return result;
+	// 2) Получение размера и валидация
+	std::streampos end = file.tellg();
+	if (end <= 0) {
+		std::cerr << "Shader size invalid: " << path << "\n";
+		return VK_NULL_HANDLE;
+	}
+	size_t size = static_cast<size_t>(end);
+
+	if ((size % 4) != 0) {
+		std::cerr << "Shader size not multiple of 4: " << size << " for " << path << "\n";
+		return VK_NULL_HANDLE;
+	}
+
+	// 3) Чтение данных
+	file.seekg(0, std::ios::beg);
+	std::vector<uint32_t> buffer(size / sizeof(uint32_t));
+	if (!file.read(reinterpret_cast<char*>(buffer.data()), size)) {
+		std::cerr << "Shader read failed: " << path << "\n";
+		return VK_NULL_HANDLE;
+	}
+
+	// 4) Создание модуля
+	VkShaderModuleCreateInfo info{
+		.sType    = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
+		.codeSize = size,
+		.pCode    = buffer.data(),
+	};
+	VkShaderModule module = VK_NULL_HANDLE;
+	if (vkCreateShaderModule(veekay::app.vk_device, &info, nullptr, &module) != VK_SUCCESS) {
+		std::cerr << "vkCreateShaderModule failed: " << path << "\n";
+		return VK_NULL_HANDLE;
+	}
+	return module;
 }
 
 VulkanBuffer createBuffer(size_t size, void *data, VkBufferUsageFlags usage) {
 	VkDevice& device = veekay::app.vk_device;
 	VkPhysicalDevice& physical_device = veekay::app.vk_physical_device;
-	
+
 	VulkanBuffer result{};
 
 	{
@@ -264,14 +303,14 @@ void initialize() {
 	VkPhysicalDevice& physical_device = veekay::app.vk_physical_device;
 
 	{ // NOTE: Build graphics pipeline
-		vertex_shader_module = loadShaderModule("./shaders/shader.vert.spv");
+vertex_shader_module   = loadShaderModule("./shaders/shader.vert.spv");
 		if (!vertex_shader_module) {
 			std::cerr << "Failed to load Vulkan vertex shader from file\n";
 			veekay::app.running = false;
 			return;
 		}
 
-		fragment_shader_module = loadShaderModule("./shaders/shader.frag.spv");
+fragment_shader_module = loadShaderModule("./shaders/shader.frag.spv");
 		if (!fragment_shader_module) {
 			std::cerr << "Failed to load Vulkan fragment shader from file\n";
 			veekay::app.running = false;
@@ -322,7 +361,7 @@ void initialize() {
 #endif
 		};
 
-		// NOTE: Bring 
+		// NOTE: Bring
 		VkPipelineVertexInputStateCreateInfo input_state_info{
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
 			.vertexBindingDescriptionCount = 1,
@@ -430,7 +469,7 @@ void initialize() {
 			veekay::app.running = false;
 			return;
 		}
-		
+
 		VkGraphicsPipelineCreateInfo info{
 			.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
 			.stageCount = 2,
@@ -459,25 +498,46 @@ void initialize() {
 	// TODO: Index buffer has to be created here too
 	// NOTE: Look for createBuffer function
 
-	// (v0)------(v1)
-	//  |  \       |
-	//  |   `--,   |
-	//  |       \  |
-	// (v3)------(v2)
-	Vertex vertices[] = {
-		{{-1.0f, -1.0f, 0.0f}},
-		{{1.0f, -1.0f, 0.0f}},
-		{{1.0f, 1.0f, 0.0f}},
-		{{-1.0f, 1.0f, 0.0f}},
-	};
+	const int segments = 8;
+	const float height = 2.0f;
+	const float radius = 0.5f;
 
-	uint32_t indices[] = { 0, 1, 2, 2, 3, 0 };
+	std::vector<Vertex> vertices;
+	std::vector<uint32_t> indices;
 
-	vertex_buffer = createBuffer(sizeof(vertices), vertices,
-	                             VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+	// Генерация боковой поверхности цилиндра
+	for (int i = 0; i < segments; ++i) {
+		float angle1 = 2.0f * std::numbers::pi * i / segments;
+		float angle2 = 2.0f * std::numbers::pi * (i + 1) / segments;
 
-	index_buffer = createBuffer(sizeof(indices), indices,
-	                            VK_BUFFER_USAGE_INDEX_BUFFER_BIT);
+		// Координаты для текущего сегмента
+		float x1 = cosf(angle1) * radius;
+		float z1 = sinf(angle1) * radius;
+		float x2 = cosf(angle2) * radius;
+		float z2 = sinf(angle2) * radius;
+
+		// Четыре вершины для двух треугольников
+		// Первый треугольник: bottom1 -> top1 -> bottom2
+		vertices.push_back({{x1, -height/2, z1}}); // bottom1
+		vertices.push_back({{x1, height/2, z1}});  // top1
+		vertices.push_back({{x2, -height/2, z2}}); // bottom2
+
+		// Второй треугольник: top1 -> top2 -> bottom2
+		vertices.push_back({{x1, height/2, z1}});  // top1
+		vertices.push_back({{x2, height/2, z2}});  // top2
+		vertices.push_back({{x2, -height/2, z2}}); // bottom2
+	}
+
+	// Создаем индексы (0, 1, 2, 3, 4, 5, ...)
+	for (uint32_t i = 0; i < segments * 6; ++i) {
+		indices.push_back(i);
+	}
+
+	vertex_buffer = createBuffer(vertices.size() * sizeof(Vertex), vertices.data(),
+								VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+
+	index_buffer = createBuffer(indices.size() * sizeof(uint32_t), indices.data(),
+							   VK_BUFFER_USAGE_INDEX_BUFFER_BIT);
 }
 
 void shutdown() {
@@ -493,20 +553,54 @@ void shutdown() {
 	vkDestroyShaderModule(device, vertex_shader_module, nullptr);
 }
 
-void update(double time) {
+	void update(double time) {
 	ImGui::Begin("Controls:");
-	ImGui::InputFloat3("Translation", reinterpret_cast<float*>(&model_position));
-	ImGui::SliderFloat("Rotation", &model_rotation, 0.0f, 2.0f * M_PI);
-	ImGui::Checkbox("Spin?", &model_spin);
-	// TODO: Your GUI stuff here
-	ImGui::End();
 
-	// NOTE: Animation code and other runtime variable updates go here
-	if (model_spin) {
-		model_rotation = float(time);
+	// Управление траекторией
+	ImGui::SliderFloat("Trajectory Radius", &trajectory_radius, 1.0f, 10.0f);
+	ImGui::SliderFloat("Trajectory Speed", &trajectory_speed, 0.1f, 5.0f);
+
+	// Управление вращением вокруг своей оси
+	ImGui::SliderFloat("Rotation Speed", &rotation_speed, 0.1f, 5.0f);
+	ImGui::Checkbox("Spin (Self Rotation)", &model_spin);
+
+	// Управление анимацией движения по кругу
+	if (ImGui::Button(animation_paused ? "Resume Orbit" : "Pause Orbit")) {
+		animation_paused = !animation_paused;
 	}
 
-	model_rotation = fmodf(model_rotation, 2.0f * M_PI);
+	if (ImGui::Button(animation_reversed ? "Normal Direction" : "Reverse Direction")) {
+		animation_reversed = !animation_reversed;
+		animation_direction = animation_reversed ? -1.0f : 1.0f;
+	}
+
+	// Отображение текущего состояния
+	ImGui::Text("Orbit: %s %s",
+				animation_paused ? "PAUSED" : "RUNNING",
+				animation_reversed ? "(REVERSED)" : "(NORMAL)");
+	ImGui::Text("Self Rotation: %s", model_spin ? "ON" : "OFF");
+
+	ImGui::End();
+
+	// Анимация движения по орбите (вокруг центра сцены)
+	if (!animation_paused) {
+		// Используем time для плавной анимации, независимой от FPS
+		trajectory_angle = time * trajectory_speed * animation_direction;
+
+		// Движение по кругу вокруг центра сцены (0,0,0)
+		model_position.x = cosf(trajectory_angle) * trajectory_radius;
+		model_position.z = sinf(trajectory_angle) * trajectory_radius;
+	}
+
+	// Анимация вращения вокруг своей оси
+	if (model_spin) {
+		// Вращение вокруг своей оси Y с собственной скоростью
+		model_rotation = time * rotation_speed;
+	}
+
+	// Нормализация углов (опционально, для избежания переполнения)
+	trajectory_angle = fmodf(trajectory_angle, 2.0f * std::numbers::pi);
+	model_rotation = fmodf(model_rotation, 2.0f * std::numbers::pi);
 }
 
 void render(VkCommandBuffer cmd, VkFramebuffer framebuffer) {
@@ -560,13 +654,13 @@ void render(VkCommandBuffer cmd, VkFramebuffer framebuffer) {
 
 		// NOTE: Variables like model_XXX were declared globally
 		ShaderConstants constants{
-			.projection = projection(
-				camera_fov,
-				float(veekay::app.window_width) / float(veekay::app.window_height),
-				camera_near_plane, camera_far_plane),
+			.projection = orthographic(
+			-5.0f, 5.0f,    // left, right
+		-5.0f, 5.0f,    // bottom, top
+		camera_near_plane, camera_far_plane),
 
-			.transform = multiply(rotation({0.0f, 1.0f, 0.0f}, model_rotation),
-			                      translation(model_position)),
+			.transform = multiply(multiply(rotation({0.0f, 1.0f, 0.0f}, model_rotation),
+								  rotation({1.0f, 0.0f, 0.0f}, -0.5f)), translation(model_position)),
 
 			.color = model_color,
 		};
@@ -576,8 +670,7 @@ void render(VkCommandBuffer cmd, VkFramebuffer framebuffer) {
 		                   VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
 		                   0, sizeof(ShaderConstants), &constants);
 
-		// NOTE: Draw 6 indices (3 vertices * 2 triangles), 1 group, no offsets
-		vkCmdDrawIndexed(cmd, 6, 1, 0, 0, 0);
+		vkCmdDrawIndexed(cmd, 8 * 6, 1, 0, 0, 0);
 	}
 
 	vkCmdEndRenderPass(cmd);
