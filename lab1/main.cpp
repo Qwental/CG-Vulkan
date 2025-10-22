@@ -79,18 +79,7 @@ Matrix identity() {
     return result;
 }
 
-// создать матрицу перспективной проекции
-Matrix projection(float fov, float aspect_ratio, float near, float far) {
-    Matrix result{};
-    const float radians = fov * std::numbers::pi / 180.0f;
-    const float cot = 1.0f / tanf(radians / 2.0f);
-    result.m[0][0] = cot / aspect_ratio;
-    result.m[1][1] = cot;
-    result.m[2][3] = 1.0f;
-    result.m[2][2] = far / (far - near);
-    result.m[3][2] = (-near * far) / (far - near);
-    return result;
-}
+
 
 // создать матрицу сдвига
 Matrix translation(Vector vector) {
@@ -105,7 +94,7 @@ Matrix translation(Vector vector) {
 Matrix orthographic(float left, float right, float bottom, float top, float near, float far) {
     Matrix result = identity();
     result.m[0][0] = 2.0f / (right - left);
-    result.m[1][1] = 2.0f / (top - bottom);
+    result.m[1][1] = -2.0f / (top - bottom);
     result.m[2][2] = 1.0f / (far - near);
     result.m[3][0] = -(right + left) / (right - left);
     result.m[3][1] = -(top + bottom) / (top - bottom);
@@ -408,7 +397,7 @@ void initialize() {
             .pAttachments = &attachment_info
         };
 
-        // push constants (для передачи матриц и цвета)
+        // push constants
         VkPushConstantRange push_constants{
             .stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
             .size = sizeof(ShaderConstants),
@@ -448,34 +437,6 @@ void initialize() {
             return;
         }
 
-        // создаем пайплайн для контура (рисование линиями)
-        VkPipelineRasterizationStateCreateInfo outline_raster_info{
-            .sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
-            .depthBiasEnable = VK_TRUE,
-            .polygonMode = VK_POLYGON_MODE_LINE,
-            .cullMode = VK_CULL_MODE_BACK_BIT,
-            .frontFace = VK_FRONT_FACE_CLOCKWISE,
-            .lineWidth = 3.0f,
-            .depthBiasConstantFactor = -1.0f,
-            .depthBiasSlopeFactor = -1.0f,
-        };
-
-        VkPipelineDepthStencilStateCreateInfo outline_depth_info{
-            .sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
-            .depthTestEnable = VK_TRUE,
-            .depthWriteEnable = VK_FALSE,
-            .depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL,
-        };
-
-        VkGraphicsPipelineCreateInfo outline_info = info;
-        outline_info.pRasterizationState = &outline_raster_info;
-        outline_info.pDepthStencilState = &outline_depth_info;
-
-        if (vkCreateGraphicsPipelines(device, nullptr, 1, &outline_info, nullptr, &outline_pipeline) != VK_SUCCESS) {
-            std::cerr << "Failed to create outline pipeline\n";
-            veekay::app.running = false;
-            return;
-        }
     }
 
     // создаем геометрию цилиндра
@@ -595,7 +556,7 @@ void render(VkCommandBuffer cmd, VkFramebuffer framebuffer) {
     const uint32_t fbw = static_cast<uint32_t>(std::round(veekay::app.window_width * fbScale.x));
     const uint32_t fbh = static_cast<uint32_t>(std::round(veekay::app.window_height * fbScale.y));
 
-    // очищаем буферы (цвет + глубина)
+    // очищаем буферы
     VkClearValue clear_color{.color = {{0.1f, 0.1f, 0.1f, 1.0f}}};
     VkClearValue clear_depth{.depthStencil = {1.0f, 0}};
     VkClearValue clears[] = {clear_color, clear_depth};
