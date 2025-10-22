@@ -584,9 +584,13 @@ void render(VkCommandBuffer cmd, VkFramebuffer framebuffer) {
         ),
         .transform = multiply(
             multiply(rotation({0.0f, 1.0f, 0.0f}, model_rotation),
-                     rotation({1.0f, 0.0f, 0.0f}, -0.5f)),
+                     rotation({1.0f, 0.0f, 0.0f}, 0.5f)),
             translation(model_position)
         ),
+//         .transform = multiply(
+//     rotation({0.0f, 1.0f, 0.0f}, model_rotation),
+//     translation(model_position)
+// ),
         .color = model_color,
     };
 
