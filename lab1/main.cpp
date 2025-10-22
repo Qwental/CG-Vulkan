@@ -28,8 +28,8 @@ struct Vector {
 };
 
 struct Vertex {
-    Vector position;  // координаты вершины
-    Vector color;     // цвет вершины
+    Vector position;
+    Vector color;
 };
 
 // константы, передаваемые в шейдеры
@@ -415,7 +415,7 @@ void initialize() {
             return;
         }
 
-        // создаем основной пайплайн (заливка)
+        //
         VkGraphicsPipelineCreateInfo info{
             .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
             .stageCount = 2,
@@ -587,7 +587,7 @@ void render(VkCommandBuffer cmd, VkFramebuffer framebuffer) {
                      rotation({1.0f, 0.0f, 0.0f}, 0.5f)),
             translation(model_position)
         ),
-//         .transform = multiply(
+//     .transform = multiply(
 //     rotation({0.0f, 1.0f, 0.0f}, model_rotation),
 //     translation(model_position)
 // ),

@@ -1,7 +1,7 @@
 #version 450
 
 // NOTE: out attributes of vertex shader must be in's
-layout (location = 0) in vec3 frag_color;  // ← ДОБАВЛЕНО: получаем цвет из vertex shader
+layout (location = 0) in vec3 frag_color;
 
 // NOTE: Pixel color
 layout (location = 0) out vec4 final_color;
@@ -14,7 +14,6 @@ layout (push_constant, std430) uniform ShaderConstants {
 };
 
 void main() {
-   // ИЗМЕНЕНО: используем интерполированный цвет из вершин вместо uniform
    if (color.r < 0.01 && color.g < 0.01 && color.b < 0.01) {
            final_color = vec4(0.0, 0.0, 0.0, 1.0);
    } else {
