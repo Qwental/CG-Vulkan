@@ -161,14 +161,13 @@ Matrix multiply(const Matrix& a, const Matrix& b) {
 // NOTE: Loads shader byte code from file
 // NOTE: Your shaders are compiled via CMake with this code too, look it up
 	VkShaderModule loadShaderModule(const char* path) {
-	// 1) Открытие файла
 	std::ifstream file(path, std::ios::binary | std::ios::ate);
 	if (!file.is_open()) {
 		std::cerr << "Shader open failed: " << path << "\n";
 		return VK_NULL_HANDLE;
 	}
 
-	// 2) Получение размера и валидация
+	// Получение размера и валидация
 	std::streampos end = file.tellg();
 	if (end <= 0) {
 		std::cerr << "Shader size invalid: " << path << "\n";
@@ -181,7 +180,7 @@ Matrix multiply(const Matrix& a, const Matrix& b) {
 		return VK_NULL_HANDLE;
 	}
 
-	// 3) Чтение данных
+	// Чтение данных
 	file.seekg(0, std::ios::beg);
 	std::vector<uint32_t> buffer(size / sizeof(uint32_t));
 	if (!file.read(reinterpret_cast<char*>(buffer.data()), size)) {
@@ -189,7 +188,7 @@ Matrix multiply(const Matrix& a, const Matrix& b) {
 		return VK_NULL_HANDLE;
 	}
 
-	// 4) Создание модуля
+	// Создание модуля
 	VkShaderModuleCreateInfo info{
 		.sType    = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
 		.codeSize = size,
