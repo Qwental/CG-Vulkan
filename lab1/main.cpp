@@ -14,7 +14,6 @@
 namespace {
 
 // параметры камеры
-constexpr float camera_fov = 70.0f;
 constexpr float camera_near_plane = 0.01f;
 constexpr float camera_far_plane = 100.0f;
 
@@ -126,6 +125,7 @@ Matrix rotation(Vector axis, float angle) {
     result.m[2][1] = (axis.z * axis.y * cosv) - (axis.x * sina);
     result.m[2][2] = (axis.z * axis.z * cosv) + cosa;
     result.m[3][3] = 1.0f;
+
     return result;
 }
 
@@ -262,7 +262,6 @@ void destroyBuffer(const VulkanBuffer& buffer) {
     vkDestroyBuffer(device, buffer.buffer, nullptr);
 }
 
-// инициализация: создание шейдеров, пайплайна, геометрии
 void initialize() {
     VkDevice& device = veekay::app.vk_device;
 
@@ -530,7 +529,12 @@ void update(double time) {
         model_position.x = trajectory_radius * cos_t / denominator;
         model_position.y = trajectory_radius * sin_t * cos_t / denominator;
         model_position.z = 5.0f;
+
+
+
     }
+
+
 
     // обновляем вращение вокруг своей оси
     if (model_spin) {
@@ -583,10 +587,11 @@ void render(VkCommandBuffer cmd, VkFramebuffer framebuffer) {
             camera_near_plane, camera_far_plane
         ),
         .transform = multiply(
-            multiply(rotation({0.0f, 1.0f, 0.0f}, model_rotation),
+            multiply(rotation({0.0f, 0.0f, 1.0f}, model_rotation),
                      rotation({1.0f, 0.0f, 0.0f}, 0.5f)),
             translation(model_position)
         ),
+
 //     .transform = multiply(
 //     rotation({0.0f, 1.0f, 0.0f}, model_rotation),
 //     translation(model_position)
