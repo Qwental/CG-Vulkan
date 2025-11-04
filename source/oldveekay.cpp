@@ -1,11 +1,11 @@
 #include <cstdint>
 #include <climits>
-
 #include <iostream>
+
 #include <vector>
 
 #include <vulkan/vulkan_core.h>
-
+// sourse/veekay.cpp
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
@@ -19,8 +19,9 @@
 
 namespace {
 
-constexpr uint32_t window_default_width = 1280;
-constexpr uint32_t window_default_height = 720;
+constexpr uint32_t window_default_width = 1200;
+constexpr uint32_t window_default_height = 700;
+
 constexpr char window_title[] = "Veekay";
 
 constexpr uint32_t max_frames_in_flight = 2;
@@ -66,24 +67,8 @@ std::vector<VkCommandBuffer> vk_command_buffers;
 
 } // namespace
 
-namespace veekay {
-
-	Application app;
-
-	namespace input {
-
-		void setup(void* const window_ptr);
-		void cache();
-
-	} // namespace input
-
-	namespace graphics {
-
-		void init();
-
-	} // namespace graphics
-
-} // namespace veekay
+// NOTE: Global application state definition
+veekay::Application veekay::app;
 
 int veekay::run(const veekay::ApplicationInfo& app_info) {
 	veekay::app.running = true;
@@ -98,27 +83,20 @@ int veekay::run(const veekay::ApplicationInfo& app_info) {
 
 	window = glfwCreateWindow(window_default_width, window_default_height,
 	                          window_title, nullptr, nullptr);
+
+
+
 	if (!window) {
 		std::cerr << "Failed to create GLFW window\n";
 		return 1;
 	}
 
-	veekay::input::setup(window);
+	int fb_width, fb_height;
+	glfwGetFramebufferSize(window, &fb_width, &fb_height);
 
-	/* NOTE:
-		needed because otherwise on macos everything will be rendered in the top
-		corner of the application window
-	*/
-#if defined(__APPLE__) && defined(__MACH__)
-	int framebuffer_width, framebuffer_height;
-	glfwGetFramebufferSize(window, &framebuffer_width, &framebuffer_height);
-
-	app.window_width = framebuffer_width;
-	app.window_height = framebuffer_height;
-#else
-	app.window_width = window_default_width;
-	app.window_height = window_default_height;
-#endif
+	// 1.3. Сохраните их в ваше приложение (если нужно)
+	veekay::app.window_width  = static_cast<uint32_t>(fb_width);
+	veekay::app.window_height = static_cast<uint32_t>(fb_height);
 
 	{ // NOTE: Initialize Vulkan: grab device and create swapchain
 		vkb::InstanceBuilder instance_builder;
@@ -146,12 +124,7 @@ int veekay::run(const veekay::ApplicationInfo& app_info) {
 
 		vkb::PhysicalDeviceSelector physical_device_selector(instance);
 
-		VkPhysicalDeviceFeatures device_features{
-			.samplerAnisotropy = true,
-		};
-
 		auto selector_result = physical_device_selector.set_surface(vk_surface)
-		                                               .set_required_features(device_features)
 		                                               .select();
 		if (!selector_result) {
 			std::cerr << selector_result.error().message() << '\n';
@@ -190,9 +163,16 @@ int veekay::run(const veekay::ApplicationInfo& app_info) {
 			.colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR,
 		};
 
+		// auto swapchain_result = swapchain_builder.set_desired_format(surface_format)
+		//                                          .set_desired_present_mode(VK_PRESENT_MODE_FIFO_KHR)
+		//                                          .set_desired_extent(window_default_width, window_default_height)
+		//                                          .add_image_usage_flags(VK_IMAGE_USAGE_TRANSFER_DST_BIT)
+		//                                          .build();
+
+
 		auto swapchain_result = swapchain_builder.set_desired_format(surface_format)
 		                                         .set_desired_present_mode(VK_PRESENT_MODE_FIFO_KHR)
-		                                         .set_desired_extent(app.window_width, app.window_height)
+		.set_desired_extent(fb_width, fb_height)
 		                                         .add_image_usage_flags(VK_IMAGE_USAGE_TRANSFER_DST_BIT)
 		                                         .build();
 
@@ -210,8 +190,6 @@ int veekay::run(const veekay::ApplicationInfo& app_info) {
 		veekay::app.vk_device = vk_device;
 		veekay::app.vk_physical_device = vk_physical_device;
 	}
-
-	graphics::init();
 
 	{ // NOTE: ImGui initialization
 		IMGUI_CHECKVERSION();
@@ -250,7 +228,7 @@ int veekay::run(const veekay::ApplicationInfo& app_info) {
 				.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
 				.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
 				.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
-				.initialLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+				.initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
 				.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
 			};
 
@@ -266,13 +244,16 @@ int veekay::run(const veekay::ApplicationInfo& app_info) {
 			};
 
 			VkSubpassDependency dependency{
-				.srcSubpass = VK_SUBPASS_EXTERNAL,
-				.dstSubpass = 0,
-				.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-				.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-				.srcAccessMask = 0,
-				.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
-			};
+				.srcSubpass    = VK_SUBPASS_EXTERNAL,
+				.dstSubpass    = 0,
+				.srcStageMask  = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,            // сцена завершила запись
+				.dstStageMask  = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,            // ImGui начнёт здесь
+				.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,                     // была запись сцены
+				.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT |                     // loadOp читает
+								 VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,                     // и пишет UI
+				.dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT,
+			  };
+
 
 			VkRenderPassCreateInfo info{
 				.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
@@ -295,8 +276,8 @@ int veekay::run(const veekay::ApplicationInfo& app_info) {
 				.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
 				.renderPass = imgui_render_pass,
 				.attachmentCount = 1,
-				.width = app.window_width,
-				.height = app.window_height,
+				.width = static_cast<uint32_t>(fb_width),
+				.height = static_cast<uint32_t>(fb_height),
 				.layers = 1,
 			};
 
@@ -386,7 +367,7 @@ int veekay::run(const veekay::ApplicationInfo& app_info) {
 			.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
 			.imageType = VK_IMAGE_TYPE_2D,
 			.format = vk_image_depth_format,
-			.extent = {app.window_width, app.window_height, 1},
+			.extent = {static_cast<uint32_t>(fb_width), static_cast<uint32_t>(fb_height), 1},
 			.mipLevels = 1,
 			.arrayLayers = 1,
 			.samples = VK_SAMPLE_COUNT_1_BIT,
@@ -550,8 +531,8 @@ int veekay::run(const veekay::ApplicationInfo& app_info) {
 			.attachmentCount = 2,
 			.pAttachments = attachments,
 
-			.width = app.window_width,
-			.height = app.window_height,
+			.width = static_cast<uint32_t>(fb_width),
+			.height = static_cast<uint32_t>(fb_height),
 			.layers = 1,
 		};
 
@@ -622,49 +603,9 @@ int veekay::run(const veekay::ApplicationInfo& app_info) {
 		}
 	}
 
-	VkCommandBuffer onetime_command_buffer; {
-		VkCommandBufferAllocateInfo info{
-			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
-			.commandPool = vk_command_pool,
-			.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
-			.commandBufferCount = 1,
-		};
-
-		if (vkAllocateCommandBuffers(vk_device, &info, &onetime_command_buffer) != VK_SUCCESS) {
-			std::cerr << "Failed to allocate Vulkan one-time command buffers\n";
-			return 1;
-		}
-	}
-
-	{
-		VkCommandBufferBeginInfo info{
-			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-			.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT,
-		};
-
-		vkBeginCommandBuffer(onetime_command_buffer, &info);
-	}
-
-	app_info.init(onetime_command_buffer);
-
-	{
-		vkEndCommandBuffer(onetime_command_buffer);
-
-		VkSubmitInfo info{
-			.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
-			.commandBufferCount = 1,
-			.pCommandBuffers = &onetime_command_buffer,
-		};
-
-		vkQueueSubmit(vk_graphics_queue, 1, &info, VK_NULL_HANDLE);
-		vkQueueWaitIdle(vk_graphics_queue);
-
-		vkFreeCommandBuffers(vk_device, vk_command_pool, 1, &onetime_command_buffer);
-	}
+	app_info.init();
 
 	while (veekay::app.running && !glfwWindowShouldClose(window)) {
-		veekay::input::cache();
-
 		glfwPollEvents();
 		double time = glfwGetTime();
 
@@ -709,7 +650,7 @@ int veekay::run(const veekay::ApplicationInfo& app_info) {
 					.renderPass = imgui_render_pass,
 					.framebuffer = imgui_framebuffers[swapchain_image_index],
 					.renderArea = {
-						.extent = {app.window_width, app.window_height},
+						.extent = {window_default_width, window_default_height},
 					},
 				};
 

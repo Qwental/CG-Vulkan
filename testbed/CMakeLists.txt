@@ -1,5 +1,3 @@
-#testbed/CMakeLists.txt
-
 cmake_minimum_required(VERSION 3.20)
 include(FetchContent)
 
@@ -9,9 +7,29 @@ add_executable(${PROJECT_NAME} main.cpp)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD_REQUIRED TRUE CXX_STANDARD 20)
 
+if(MSVC)
+	target_compile_options(${PROJECT_NAME} PRIVATE /wd4201)
+	target_compile_definitions(${PROJECT_NAME} PRIVATE -D_USE_MATH_DEFINES)
+endif()
+
 find_package(Vulkan REQUIRED)
 
+FetchContent_Declare(
+		lodepng
+		GIT_REPOSITORY https://github.com/lvandeve/lodepng
+)
+
+FetchContent_MakeAvailable(lodepng)
+
 target_link_libraries(${PROJECT_NAME} veekay Vulkan::Headers)
+
+target_sources(${PROJECT_NAME} PRIVATE
+		${lodepng_SOURCE_DIR}/lodepng.cpp
+)
+
+target_include_directories(${PROJECT_NAME} PRIVATE
+		${lodepng_SOURCE_DIR}
+)
 
 # Compile shaders
 find_program(GLSLC_FOUND glslc)
@@ -24,10 +42,10 @@ if(GLSLC_FOUND)
 		set(SHADER_BINARY_PATH ${CMAKE_SOURCE_DIR}/shaders/${SHADER_BINARY})
 
 		add_custom_command(
-			OUTPUT ${SHADER_BINARY_PATH}
-			COMMAND glslc ${SHADER_SOURCE} -o ${SHADER_BINARY_PATH}
-			DEPENDS ${SHADER_SOURCE}
-			COMMENT "Compiling ${SHADER_FILE} shader"
+				OUTPUT ${SHADER_BINARY_PATH}
+				COMMAND glslc ${SHADER_SOURCE} -o ${SHADER_BINARY_PATH}
+				DEPENDS ${SHADER_SOURCE}
+				COMMENT "Compiling ${SHADER_FILE} shader"
 		)
 
 		list(APPEND _SHADER_BINARIES ${SHADER_BINARY_PATH})
