@@ -12,8 +12,6 @@
 #include <imgui.h>
 #include <lodepng.h>
 
-
-
 namespace {
 
 float animation_time = 0.0f;
@@ -22,28 +20,33 @@ float trajectory_radius = 1.5f;
 bool animation_paused = false;
 float pause_time = 0.0f;
 int animation_direction = 1;
-int cylinder_model_index = 1;
+int cylinder_model_index = 2;  // NOTE: Теперь третий (0-куб, 1-цилиндр)
 
 // NOTE: Параметры освещения (управляемы через UI)
-struct LightingParams {
-    // NOTE: Ambient свет
-    veekay::vec3 ambient_color = {0.3f, 0.3f, 0.3f};
+    // paste.txt, строка ~31
+    struct LightingParams {
+        // NOTE: Ambient свет (рассеянный)
+        // Значения из ImGui (77/255)
+        veekay::vec3 ambient_color = {0.30f, 0.30f, 0.30f};
 
-    // NOTE: Directional свет (солнце)
-    veekay::vec3 directional_direction = {-1.0f, -1.0f, -1.0f};
-    veekay::vec3 directional_color = {1.0f, 1.0f, 1.0f};
+        // NOTE: Directional свет (солнце)
+        veekay::vec3 directional_direction = {-1.0f, -1.0f, -1.0f};
+        // Значения из ImGui (R:216, G:74, B:74)
+        veekay::vec3 directional_color = {0.85f, 0.29f, 0.29f};
 
-    // NOTE: Spot light параметры
-    struct SpotLightUI {
-        veekay::vec3 position = {0.0f, 5.0f, 0.0f};
-        veekay::vec3 direction = {0.0f, -1.0f, 0.0f};
-        veekay::vec3 color = {1.0f, 1.0f, 0.2f};
-        float intensity = 2.0f;
-        float radius = 20.0f;
-        float inner_angle = 20.0f;
-        float outer_angle = 35.0f;
-    } spot_light;
-} lighting_params;
+        // NOTE: Spot light параметры (прожектор)
+        struct SpotLightUI {
+            veekay::vec3 position = {0.0f, 9.638f, 1.714f};
+            veekay::vec3 direction = {-0.507f, 0.304f, 0.200f};
+            // Значения из ImGui (R:0, G:83, B:255)
+            veekay::vec3 color = {0.0f, 0.325f, 1.0f};
+            float intensity = 5.0f;
+            float radius = 13.250f;
+            float inner_angle = 35.419f;
+            float outer_angle = 48.548f;
+        } spot_light;
+
+    } lighting_params;
 
 constexpr uint32_t max_models = 1024;
 
@@ -167,7 +170,9 @@ struct Camera {
 // NOTE: Scene objects
 inline namespace {
     Camera camera{
-        .position = {0.0f, -0.5f, -3.0f}
+        .position = {-3.5f, -3.5f, -5.0f},
+        .pitch = 30.0f,
+        .yaw = 0.0f
     };
 
     std::vector<Model> models;
@@ -190,6 +195,7 @@ inline namespace {
     veekay::graphics::Buffer* spot_lights_buffer;
 
     Mesh plane_mesh;
+    Mesh cube_mesh;
     Mesh cylinder_mesh;
 
     veekay::graphics::Texture* missing_texture;
@@ -702,10 +708,10 @@ void initialize(VkCommandBuffer cmd) {
     // NOTE: Plane mesh initialization
     {
         std::vector<Vertex> vertices = {
-            {{-5.0f, 0.0f, 5.0f}, {0.0f, -1.0f, 0.0f}, {0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}},
-            {{5.0f, 0.0f, 5.0f}, {0.0f, -1.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}},
-            {{5.0f, 0.0f, -5.0f}, {0.0f, -1.0f, 0.0f}, {1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}},
-            {{-5.0f, 0.0f, -5.0f}, {0.0f, -1.0f, 0.0f}, {0.0f, 1.0f}, {1.0f, 1.0f, 1.0f}},
+            {{-5.0f, -2.0f, 5.0f}, {0.0f, -1.0f, 0.0f}, {0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}},
+            {{5.0f, -2.0f, 5.0f}, {0.0f, -1.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}},
+            {{5.0f, -2.0f, -5.0f}, {0.0f, -1.0f, 0.0f}, {1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}},
+            {{-5.0f, -2.0f, -5.0f}, {0.0f, -1.0f, 0.0f}, {0.0f, 1.0f}, {1.0f, 1.0f, 1.0f}},
         };
 
         std::vector<uint32_t> indices = {
@@ -721,6 +727,72 @@ void initialize(VkCommandBuffer cmd) {
             VK_BUFFER_USAGE_INDEX_BUFFER_BIT);
 
         plane_mesh.indices = static_cast<uint32_t>(indices.size());
+    }
+
+    // NOTE: Cube mesh initialization
+    {
+        std::vector<Vertex> vertices = {
+            // NOTE: Front face (Z+)
+            {{-0.5f, -0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
+            {{0.5f, -0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}, {1.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
+            {{0.5f, 0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}, {1.0f, 0.0f, 0.0f}},
+            {{-0.5f, 0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}, {1.0f, 0.0f, 0.0f}},
+
+            // NOTE: Back face (Z-)
+            {{0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},
+            {{-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},
+            {{-0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {1.0f, 1.0f}, {0.0f, 1.0f, 0.0f}},
+            {{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {0.0f, 1.0f}, {0.0f, 1.0f, 0.0f}},
+
+            // NOTE: Top face (Y+)
+            {{-0.5f, 0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
+            {{0.5f, 0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
+            {{0.5f, 0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},
+            {{-0.5f, 0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},
+
+            // NOTE: Bottom face (Y-)
+            {{-0.5f, -0.5f, -0.5f}, {0.0f, -1.0f, 0.0f}, {0.0f, 0.0f}, {1.0f, 1.0f, 0.0f}},
+            {{0.5f, -0.5f, -0.5f}, {0.0f, -1.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 1.0f, 0.0f}},
+            {{0.5f, -0.5f, 0.5f}, {0.0f, -1.0f, 0.0f}, {1.0f, 1.0f}, {1.0f, 1.0f, 0.0f}},
+            {{-0.5f, -0.5f, 0.5f}, {0.0f, -1.0f, 0.0f}, {0.0f, 1.0f}, {1.0f, 1.0f, 0.0f}},
+
+            // NOTE: Right face (X+)
+            {{0.5f, -0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}, {1.0f, 0.5f, 0.0f}},
+            {{0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 0.5f, 0.0f}},
+            {{0.5f, 0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 1.0f}, {1.0f, 0.5f, 0.0f}},
+            {{0.5f, 0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}, {1.0f, 0.5f, 0.0f}},
+
+            // NOTE: Left face (X-)
+            {{-0.5f, -0.5f, -0.5f}, {-1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}, {0.5f, 0.0f, 1.0f}},
+            {{-0.5f, -0.5f, 0.5f}, {-1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}, {0.5f, 0.0f, 1.0f}},
+            {{-0.5f, 0.5f, 0.5f}, {-1.0f, 0.0f, 0.0f}, {1.0f, 1.0f}, {0.5f, 0.0f, 1.0f}},
+            {{-0.5f, 0.5f, -0.5f}, {-1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}, {0.5f, 0.0f, 1.0f}},
+        };
+
+        std::vector<uint32_t> indices = {
+            // Front
+            0, 1, 2, 2, 3, 0,
+            // Back
+            4, 5, 6, 6, 7, 4,
+            // Top
+            8, 9, 10, 10, 11, 8,
+            // Bottom
+            12, 13, 14, 14, 15, 12,
+            // Right
+            16, 17, 18, 18, 19, 16,
+            // Left
+            20, 21, 22, 22, 23, 20,
+        };
+
+        cube_mesh.vertex_buffer = new veekay::graphics::Buffer(
+            vertices.size() * sizeof(Vertex), vertices.data(),
+            VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+
+        cube_mesh.index_buffer = new veekay::graphics::Buffer(
+            indices.size() * sizeof(uint32_t), indices.data(),
+            VK_BUFFER_USAGE_INDEX_BUFFER_BIT);
+
+        cube_mesh.indices = static_cast<uint32_t>(indices.size());
     }
 
     // NOTE: Cylinder mesh initialization
@@ -809,15 +881,25 @@ void initialize(VkCommandBuffer cmd) {
     // NOTE: Add models to scene
     models.emplace_back(Model{
         .mesh = plane_mesh,
-        .transform = Transform{},
+        .transform = Transform{.position = {0.0f, 3.0f, 0.0f}},
         .albedo_color = veekay::vec3{1.0f, 1.0f, 1.0f}
+    });
+
+    // NOTE: КУБА
+    models.emplace_back(Model{
+        .mesh = cube_mesh,
+        .transform = Transform{
+            .position = {2.0f, -0.5f, 0.0f},
+            .scale = {0.8f, 0.8f, 0.8f},
+        },
+        .albedo_color = veekay::vec3{0.9f, 0.2f, 0.2f}
     });
 
     // NOTE: ЦИЛИНДР
     models.emplace_back(Model{
         .mesh = cylinder_mesh,
         .transform = Transform{
-            .position = {0.0f, 0.0f, 0.0f},
+            .position = {0.0f, -0.0f, 0.0f},
         },
         .albedo_color = veekay::vec3{0.8f, 0.8f, 0.8f}
     });
@@ -832,6 +914,9 @@ void shutdown() {
 
     delete cylinder_mesh.index_buffer;
     delete cylinder_mesh.vertex_buffer;
+
+    delete cube_mesh.index_buffer;
+    delete cube_mesh.vertex_buffer;
 
     delete plane_mesh.index_buffer;
     delete plane_mesh.vertex_buffer;
@@ -968,14 +1053,18 @@ void update(double time) {
     // NOTE: Копируем в GPU буфер
     *(SceneUniforms*)scene_uniforms_buffer->mapped_region = scene_uniforms;
 
+    // NOTE: Позиция куба (на нём прожектор)
+    veekay::vec3 cube_position = models[1].transform.position;
+
     // NOTE: Создаём и заполняем spot lights
     SpotLightsBuffer spot_lights_data{};
 
     float inner_angle = lighting_params.spot_light.inner_angle * M_PI / 180.0f;
     float outer_angle = lighting_params.spot_light.outer_angle * M_PI / 180.0f;
 
+    // NOTE: Прожектор привязан к кубику (на верхушке)
     spot_lights_data.lights[0] = SpotLight{
-        .position = lighting_params.spot_light.position,
+        .position = cube_position + veekay::vec3{0.0f, 0.5f, 0.0f},
         .direction = normalize(lighting_params.spot_light.direction),
         .color = lighting_params.spot_light.color,
         .intensity = lighting_params.spot_light.intensity,
@@ -1019,6 +1108,11 @@ void update(double time) {
             uniforms.shininess = 16.0f;
         }
         else if (i == 1) {
+            // NOTE: Куб: блестящий материал
+            uniforms.specular_color = {1.0f, 1.0f, 1.0f};
+            uniforms.shininess = 128.0f;
+        }
+        else if (i == 2) {
             // NOTE: Цилиндр: глянцевый материал
             uniforms.specular_color = {1.0f, 1.0f, 1.0f};
             uniforms.shininess = 64.0f;
