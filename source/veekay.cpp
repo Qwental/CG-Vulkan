@@ -778,6 +778,7 @@ int veekay::run(const veekay::ApplicationInfo& app_info) {
 	vkFreeMemory(vk_device, vk_image_depth_memory, nullptr);
 	vkDestroyImage(vk_device, vk_image_depth, nullptr);
 
+
 	vkDestroyCommandPool(vk_device, imgui_command_pool, nullptr);
 	vkDestroyRenderPass(vk_device, imgui_render_pass, nullptr);
 
