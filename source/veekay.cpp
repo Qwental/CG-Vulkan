@@ -791,6 +791,7 @@ int veekay::run(const veekay::ApplicationInfo& app_info) {
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
 
+
 	vkDestroyDescriptorPool(vk_device, imgui_descriptor_pool, nullptr);
 
 	vkDestroySwapchainKHR(vk_device, vk_swapchain, nullptr);
