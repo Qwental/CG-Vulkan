@@ -32,22 +32,27 @@ layout (binding = 1, std140) uniform ModelUniforms {
     vec3 specular_color;
     float _pad1_m;
     float shininess;
-    float _pad2_m;
+    float is_skybox;
     float _pad3_m;
     float _pad4_m;
 };
-
 void main() {
-    // NOTE: Преобразуем позицию в мировые координаты
     vec4 world_position = model * vec4(v_position, 1.0);
-
-    // NOTE: Преобразуем нормаль в мировые координаты (w=0 для векторов)
     vec4 world_normal = model * vec4(v_normal, 0.0);
 
-    // NOTE: Финальное преобразование: мир - экран (NDC)
-    gl_Position = view_projection * world_position;
+    vec4 clip_pos = view_projection * world_position;
 
-    // NOTE: Передаём данные во фрагментный шейдер
+    // ============================================
+    // НОВОЕ: Проверяем флаг скайбокса
+    // ============================================
+    if (is_skybox > 0.5) {
+        // Для скайбокса: устанавливаем z = w
+        gl_Position = clip_pos.xyww;
+    } else {
+        // Для обычных объектов: оставляем как есть
+        gl_Position = clip_pos;
+    }
+
     f_position = world_position.xyz;
     f_normal = normalize(world_normal.xyz);
     f_uv = v_uv;

@@ -7,7 +7,6 @@ layout (location = 3) in vec3 f_color;
 
 layout (location = 0) out vec4 final_color;
 
-// NOTE: Scene uniforms (освещение и камера)
 layout (binding = 0, std140) uniform SceneUniforms {
     mat4 view_projection;
     vec3 view_position;
@@ -21,7 +20,6 @@ layout (binding = 0, std140) uniform SceneUniforms {
     uint spot_lights_count;
 };
 
-// NOTE: Model uniforms (материалы)
 layout (binding = 1, std140) uniform ModelUniforms {
     mat4 model;
     vec3 albedo_color;
@@ -29,12 +27,11 @@ layout (binding = 1, std140) uniform ModelUniforms {
     vec3 specular_color;
     float _pad1_m;
     float shininess;
-    float _pad2_m;
+    float is_skybox;  // <-- переименовали pad2
     float _pad3_m;
     float _pad4_m;
 };
 
-// NOTE: Spot light структура
 struct SpotLight {
     vec3 position;
     float _pad0;
@@ -48,90 +45,76 @@ struct SpotLight {
     float outer_angle_cos;
 };
 
-// NOTE: Spot lights буфер (binding = 2)
 layout (binding = 2, std140) uniform SpotLightsBuffer {
     SpotLight spot_lights[16];
 };
 
-// NOTE: Вычисляет Блинна-Фонга для одного источника света
-vec3 blinn_phong(vec3 N, vec3 V, vec3 L, vec3 light_color, vec3 Kd, vec3 Ks, float sh) {
-    // NOTE: Half-vector между V и L
-    vec3 H = normalize(V + L);
+layout (set = 1, binding = 0) uniform sampler2D albedo_texture;
+layout (set = 1, binding = 1) uniform sampler2D specular_texture;
+layout (set = 1, binding = 2) uniform sampler2D emissive_texture;
 
-    // NOTE: Диффузная компонента: K_d * cos(theta) * I_light
+vec3 blinn_phong(vec3 N, vec3 V, vec3 L, vec3 light_color, vec3 Kd, vec3 Ks, float sh) {
+    vec3 H = normalize(V + L);
     float NdotL = max(0.0, dot(N, L));
     vec3 diffuse = Kd * NdotL * light_color;
-
-    // NOTE: Спекулярная компонента: K_s * (cos(alpha))^sh * I_light
     float NdotH = max(0.0, dot(N, H));
     float specular_intensity = pow(NdotH, sh);
     vec3 specular = Ks * specular_intensity * light_color;
-
     return diffuse + specular;
 }
 
-// NOTE: Вычисляет освещение от spot light источника с конусом и затуханием
 vec3 spot_light_contribution(vec3 N, vec3 V, vec3 P, SpotLight light, vec3 Kd, vec3 Ks, float sh) {
-    // NOTE: Вектор от фрагмента к источнику света
     vec3 L = light.position - P;
     float distance = length(L);
-
-    // NOTE: Если фрагмент дальше радиуса, нет освещения
     if (distance > light.radius) return vec3(0.0);
-
     L = normalize(L);
-
-    // NOTE: Проверяем, находится ли фрагмент в конусе
-    // -L потому что L указывает НА свет, а direction указывает куда светит
     float angle_cos = dot(-L, light.direction);
-
-    // NOTE: Если вне конуса, нет вклада
     if (angle_cos < light.outer_angle_cos) return vec3(0.0);
-
-    // NOTE: Мягкая граница между inner и outer углом
     float spot_intensity = 1.0;
     if (angle_cos < light.inner_angle_cos) {
-        // NOTE: Плавный переход между inner и outer
         float t = (angle_cos - light.outer_angle_cos) /
-                  (light.inner_angle_cos - light.outer_angle_cos);
+        (light.inner_angle_cos - light.outer_angle_cos);
         spot_intensity = t * t;
     }
-
-    // NOTE: Затухание по расстоянию
     float attenuation = 1.0 / (1.0 + distance * distance);
-
-    // NOTE: Вычисляем Блинни-Фонга
     vec3 contribution = blinn_phong(N, V, L, light.color, Kd, Ks, sh);
-
-    // NOTE: Применяем интенсивность, затухание и конусное затухание
     return contribution * light.intensity * attenuation * spot_intensity;
 }
 
 void main() {
-    // NOTE: Нормализуем интерполированную нормаль
-    vec3 N = normalize(f_normal);
+    vec3 albedo_tex = texture(albedo_texture, f_uv).rgb;
+    vec3 specular_tex = texture(specular_texture, f_uv).rgb;
+    vec3 emissive_tex = texture(emissive_texture, f_uv).rgb;
 
-    // NOTE: Вектор в камеру (V = view_position - fragment_position)
-    vec3 V = normalize(view_position - f_position);
+    vec3 Kd = albedo_tex * albedo_color;
+    vec3 Ks = specular_tex * specular_color;
 
-    // NOTE: Вектор направления солнца (уже нормализован в CPU)
-    vec3 L = normalize(sun_light_direction);
-
-    // NOTE: Минимальная освещённость везде
-    vec3 ambient = ambient_light_intensity * albedo_color;
-
-    // NOTE: Вычисляем Блинн-Фонга для направленного источника света (солнце)
-    vec3 directional = blinn_phong(N, V, L, sun_light_color, albedo_color, specular_color, shininess);
-
-    // NOTE: Суммируем вклад от всех spot lights
-    vec3 spot_contribution = vec3(0.0);
-    for (uint i = 0u; i < spot_lights_count; ++i) {
-        spot_contribution += spot_light_contribution(N, V, f_position, spot_lights[i], albedo_color, specular_color, shininess);
+    // ============================================
+    // НОВОЕ: Для скайбокса - только текстура
+    // ============================================
+    if (is_skybox > 0.5) {
+        // Режим "unlit" - только альбедо текстура
+        final_color = vec4(albedo_tex, 1.0);
+        return;
     }
 
-    // NOTE: Результат = ambient + directional + spot lights
-    vec3 color = ambient + directional + spot_contribution;
+    // ============================================
+    // Для обычных объектов - полный расчет освещения
+    // ============================================
+    vec3 N = normalize(f_normal);
+    vec3 V = normalize(view_position - f_position);
+    vec3 L = normalize(sun_light_direction);
 
-    // NOTE: Финальный цвет с альфа-каналом
+    vec3 ambient = ambient_light_intensity * Kd;
+    vec3 directional = blinn_phong(N, V, L, sun_light_color, Kd, Ks, shininess);
+
+    vec3 spot_contribution = vec3(0.0);
+    for (uint i = 0u; i < spot_lights_count; ++i) {
+        spot_contribution += spot_light_contribution(N, V, f_position, spot_lights[i], Kd, Ks, shininess);
+    }
+
+    vec3 color = ambient + directional + spot_contribution;
+    color += emissive_tex;
+
     final_color = vec4(color, 1.0);
 }
