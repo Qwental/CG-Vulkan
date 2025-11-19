@@ -21,25 +21,17 @@ float trajectory_radius = 1.5f;
 bool animation_paused = false;
 float pause_time = 0.0f;
 int animation_direction = 1;
-int cylinder_model_index = 0;  // NOTE: Теперь третий (0-куб, 1-цилиндр)
+int cylinder_model_index = 0;
 
-// NOTE: Параметры освещения (управляемы через UI)
-    // paste.txt, строка ~31
+// NOTE: Параметры освещения
     struct LightingParams {
-        // NOTE: Ambient свет (рассеянный)
-        // Значения из ImGui (77/255)
+
         veekay::vec3 ambient_color = {0.30f, 0.30f, 0.30f};
-
-        // NOTE: Directional свет (солнце)
         veekay::vec3 directional_direction = {-1.0f, -1.0f, -1.0f};
-        // Значения из ImGui (R:216, G:74, B:74)
         veekay::vec3 directional_color = {0.85f, 0.29f, 0.29f};
-
-        // NOTE: Spot light параметры (прожектор)
         struct SpotLightUI {
             veekay::vec3 position = {0.0f, 9.638f, 1.714f};
             veekay::vec3 direction = {-0.507f, 0.304f, 0.200f};
-            // Значения из ImGui (R:0, G:83, B:255)
             veekay::vec3 color = {0.0f, 0.325f, 1.0f};
             float intensity = 5.0f;
             float radius = 13.250f;
@@ -58,68 +50,54 @@ struct Vertex {
     veekay::vec3 color;
 };
 
-// NOTE: Структура для хранения одного spot light
 struct SpotLight {
-    veekay::vec3 position;      // Позиция прожектора
+    veekay::vec3 position;
     float _pad0;
-
-    veekay::vec3 direction;     // Направление, куда светит (нормализовано)
+    veekay::vec3 direction;
     float _pad1;
-
-    veekay::vec3 color;         // Цвет света (RGB)
+    veekay::vec3 color;
     float _pad2;
-
-    float intensity;            // Интенсивность (яркость)
-    float radius;               // Радиус затухания (макс расстояние)
-    float inner_angle_cos;      // cos(inner_angle) для полного света
-    float outer_angle_cos;      // cos(outer_angle) для мягкой границы
+    float intensity;
+    float radius;
+    float inner_angle_cos;
+    float outer_angle_cos;
 };
 
-// NOTE: Максимальное количество spot lights
 constexpr uint32_t max_spot_lights = 16;
 
-// NOTE: Буфер для всех spot lights
 struct SpotLightsBuffer {
     SpotLight lights[max_spot_lights];
 };
 
 struct SceneUniforms {
     veekay::mat4 view_projection;
-
-    // NOTE: Позиция камеры для V вектора в Блинн-Фонге
     veekay::vec3 view_position;
     float _pad0;
-
-    // NOTE: Интенсивность ambient света (общее освещение)
     veekay::vec3 ambient_light_intensity;
     float _pad1;
 
-    // NOTE: Направление солнца (directional light)
     veekay::vec3 sun_light_direction;
     float _pad2;
 
-    // NOTE: Цвет солнца (для расчёта освещения)
     veekay::vec3 sun_light_color;
     float _pad3;
 
-    // NOTE: Количество spot lights для циклов в шейдере
     uint32_t spot_lights_count;
 };
 
 struct ModelUniforms {
     veekay::mat4 model;
 
-    // NOTE: Диффузный цвет материала (K_d из Лекции-5)
     veekay::vec3 albedo_color;
     float _pad0;
 
-    // NOTE: Цвет отраженного блика (K_s из Лекции-5)
+    // NOTE: Цвет отраженного блика
     veekay::vec3 specular_color;
     float _pad1;
 
-    // NOTE: Параметр блеска (shininess из Лекции-5)
-    // Чем больше, тем острее блик (типично 16-128)
+    // NOTE: Параметр блеска
     float shininess;
+
     float _pad2;
     float _pad3;
     float _pad4;
@@ -135,7 +113,6 @@ struct Transform {
     veekay::vec3 position = {};
     veekay::vec3 scale = {1.0f, 1.0f, 1.0f};
     veekay::vec3 rotation = {};
-
     // NOTE: Model matrix (translation, rotation and scaling)
     veekay::mat4 matrix() const;
 };
@@ -164,15 +141,11 @@ struct Camera {
     constexpr static float mouse_sensitivity = 0.1f;
     veekay::vec3 position = {};
     veekay::vec3 rotation = {};
-    // NOTE: Pitch (вертикальный угол, градусы) угол поворота вверх/вниз
-    // NOTE: Yaw (горизонтальный угол, градусы) угол поворота влево/вправо
     float pitch = 0.0f;
     float yaw = -90.0f;
     float fov = default_fov;
     float near_plane = default_near_plane;
     float far_plane = default_far_plane;
-
-    // NOTE: View matrix of camera (inverse of a transform)
     veekay::mat4 view() const;
 
     // NOTE: View and projection composition
@@ -211,8 +184,6 @@ inline namespace {
     VkSampler texture_sampler;
     VkSampler skyboxsampler;
 
-
-
     VkShaderModule vertex_shader_module;
     VkShaderModule fragment_shader_module;
 
@@ -244,7 +215,6 @@ struct CameraBasis {
     veekay::vec3 up;       // Вектор вверх
 };
 
-// NOTE: Helper function для кросс-произведения
 inline veekay::vec3 cross(const veekay::vec3& a, const veekay::vec3& b) {
     return {
         a.y * b.z - a.z * b.y,
@@ -253,7 +223,6 @@ inline veekay::vec3 cross(const veekay::vec3& a, const veekay::vec3& b) {
     };
 }
 
-// NOTE: Helper function для нормализации вектора
 inline veekay::vec3 normalize(const veekay::vec3& v) {
     float len = std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
     if (len > 0.0001f) {
@@ -262,17 +231,15 @@ inline veekay::vec3 normalize(const veekay::vec3& v) {
     return v;
 }
 
-// NOTE: Helper function для скалярного произведения
 inline float dot(const veekay::vec3& a, const veekay::vec3& b) {
     return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
 // NOTE: Вычисляет базисные векторы камеры из pitch/yaw
 inline CameraBasis compute_camera_basis(float pitch_deg, float yaw_deg) {
-    // NOTE: Преобразуем в радианы
+
     float pitch = pitch_deg * M_PI / 180.0f;
     float yaw = yaw_deg * M_PI / 180.0f;
-
     // NOTE: Back = направление "от камеры в мир"
     veekay::vec3 back = {
         std::cos(pitch) * std::sin(yaw),
@@ -303,10 +270,10 @@ float toRadians(float degrees) {
 }
 
 veekay::mat4 Transform::matrix() const {
-    // TODO: Scaling and rotation
     auto t = veekay::mat4::translation(position);
     return t;
 }
+
 
 veekay::mat4 Camera::view() const {
     // NOTE: Вычисляем базисные векторы камеры из pitch/yaw
@@ -471,6 +438,99 @@ Material createMaterial(VkCommandBuffer cmd, VkDevice device,
 }
 
 
+Material createMaterialWithEmissive(
+    VkCommandBuffer cmd, VkDevice device,
+    const char* albedo_path,
+    const char* emissive_path,
+    VkDescriptorPool pool,
+    VkDescriptorSetLayout layout,
+    VkSampler sampler)
+{
+    Material mat;
+
+    // Загрузка albedo текстуры
+    std::vector<uint8_t> pixels;
+    unsigned int width, height;
+    unsigned int error = lodepng::decode(pixels, width, height, albedo_path);
+
+    if (error) {
+        std::cerr << "Failed to load " << albedo_path << ": "
+                  << lodepng_error_text(error) << "\n";
+        uint32_t fallback[] = {0xffff00ff, 0xff000000, 0xff000000, 0xffff00ff};
+        mat.albedo = new veekay::graphics::Texture(cmd, 2, 2, VK_FORMAT_R8G8B8A8_UNORM, fallback);
+    } else {
+        mat.albedo = new veekay::graphics::Texture(cmd, width, height, VK_FORMAT_R8G8B8A8_UNORM, pixels.data());
+    }
+
+    // Создаём белую specular текстуру (как заглушку)
+    veekay::vec4 white = {1.0f, 1.0f, 1.0f, 1.0f};
+    mat.specular = new veekay::graphics::Texture(cmd, 1, 1, VK_FORMAT_R32G32B32A32_SFLOAT, &white);
+
+    // Загрузка emissive текстуры
+    error = lodepng::decode(pixels, width, height, emissive_path);
+    if (error) {
+        std::cerr << "Failed to load " << emissive_path << ": "
+                  << lodepng_error_text(error) << "\n";
+        // fallback на чёрную текстуру
+        veekay::vec4 black = {0.0f, 0.0f, 0.0f, 1.0f};
+        mat.emissive = new veekay::graphics::Texture(cmd, 1, 1, VK_FORMAT_R32G32B32A32_SFLOAT, &black);
+    } else {
+        mat.emissive = new veekay::graphics::Texture(cmd, width, height, VK_FORMAT_R8G8B8A8_UNORM, pixels.data());
+    }
+
+    // Выделяем descriptor set
+    VkDescriptorSetAllocateInfo info{
+        .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
+        .descriptorPool = pool,
+        .descriptorSetCount = 1,
+        .pSetLayouts = &layout,
+    };
+
+    if (vkAllocateDescriptorSets(device, &info, &mat.descriptor_set) != VK_SUCCESS) {
+        std::cerr << "Failed to allocate material descriptor set\n";
+        return mat;
+    }
+
+    // Обновляем descriptor set
+    VkDescriptorImageInfo image_infos[] = {
+        {.sampler = sampler,
+         .imageView = mat.albedo->view,
+         .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL},
+        {.sampler = sampler,
+         .imageView = mat.specular->view,
+         .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL},
+        {.sampler = sampler,
+         .imageView = mat.emissive->view,
+         .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL},
+    };
+
+    VkWriteDescriptorSet writes[] = {
+        {.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+         .dstSet = mat.descriptor_set,
+         .dstBinding = 0,
+         .descriptorCount = 1,
+         .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+         .pImageInfo = &image_infos[0]},
+        {.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+         .dstSet = mat.descriptor_set,
+         .dstBinding = 1,
+         .descriptorCount = 1,
+         .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+         .pImageInfo = &image_infos[1]},
+        {.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+         .dstSet = mat.descriptor_set,
+         .dstBinding = 2,
+         .descriptorCount = 1,
+         .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+         .pImageInfo = &image_infos[2]},
+    };
+
+    vkUpdateDescriptorSets(device, 3, writes, 0, nullptr);
+
+    return mat;
+}
+
+
 
 Mesh createBox(float x_min, float y_min, float z_min,
                float width, float height, float depth) {
@@ -487,7 +547,7 @@ Mesh createBox(float x_min, float y_min, float z_min,
         {{x_max, y_max, z_max}, {0.0f, 0.0f, 1.0f}, {width, height}, {1.0f, 1.0f, 1.0f}},
         {{x_min, y_max, z_max}, {0.0f, 0.0f, 1.0f}, {0.0f, height}, {1.0f, 1.0f, 1.0f}},
 
-        // Задняя грань (Z-) - ИСПРАВЛЕНО
+        // Задняя грань (Z-)
         {{x_max, y_min, z_min}, {0.0f, 0.0f, -1.0f}, {0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}},
         {{x_min, y_min, z_min}, {0.0f, 0.0f, -1.0f}, {width, 0.0f}, {1.0f, 1.0f, 1.0f}},
         {{x_min, y_max, z_min}, {0.0f, 0.0f, -1.0f}, {width, height}, {1.0f, 1.0f, 1.0f}},
@@ -534,9 +594,7 @@ Mesh createBox(float x_min, float y_min, float z_min,
     mesh.index_buffer = new veekay::graphics::Buffer(
         indices.size() * sizeof(uint32_t), indices.data(),
         VK_BUFFER_USAGE_INDEX_BUFFER_BIT);
-
     mesh.indices = static_cast<uint32_t>(indices.size());
-
     return mesh;
 }
 
@@ -779,9 +837,7 @@ void initialize(VkCommandBuffer cmd) {
             }
         }
 
-        // ============================================
-        // НОВОЕ: Создаём descriptor set layout для текстур (set = 1)
-        // ============================================
+        //  Создаём descriptor set layout для текстур (set = 1)
         {
             VkDescriptorSetLayoutBinding texture_bindings[] = {
                 {
@@ -836,7 +892,7 @@ void initialize(VkCommandBuffer cmd) {
 
 
 
-        // NOTE: Declare external data sources (освещение + текстуры)
+        // NOTE: Declare external data sources
         VkDescriptorSetLayout layouts[] = {
             descriptor_set_layout,      // set = 0 (освещение)
             texture_descriptor_layout,  // set = 1 (текстуры)
@@ -844,7 +900,7 @@ void initialize(VkCommandBuffer cmd) {
 
         VkPipelineLayoutCreateInfo layout_info{
             .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
-            .setLayoutCount = 2,  // БЫЛО 1, СТАЛО 2
+            .setLayoutCount = 2,
             .pSetLayouts = layouts,
         };
 
@@ -921,15 +977,14 @@ void initialize(VkCommandBuffer cmd) {
     }
 
 
-    // ============================================
-    // НОВОЕ: Загрузка материалов
-    // ============================================
+
+    //  Загрузка материалов
 
     // Создаём сэмплер для текстур
     {
         VkSamplerCreateInfo info{
             .sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
-            .magFilter = VK_FILTER_NEAREST,  // Minecraft style!
+            .magFilter = VK_FILTER_NEAREST,
             .minFilter = VK_FILTER_NEAREST,
             .mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST,
             .addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT,
@@ -946,7 +1001,7 @@ void initialize(VkCommandBuffer cmd) {
 
 
 
-        // ДОБАВЬТЕ НОВЫЙ СЭМПЛЕР ДЛЯ СКАЙБОКСА
+        // СЭМПЛЕР ДЛЯ СКАЙБОКСА
         VkSampler skyboxsampler;
         VkSamplerCreateInfo skyboxinfo {
             .sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
@@ -965,67 +1020,62 @@ void initialize(VkCommandBuffer cmd) {
         }
     }
 
-    // 1. Wood (дерево)
     materials.push_back(createMaterial(cmd, device, "assets/wood.png",
                                        descriptor_pool, texture_descriptor_layout,
                                        texture_sampler));
     wood_material_id = materials.size() - 1;
-    std::cout << "Wood material ID: " << wood_material_id << std::endl;
 
-    // 2. Oak (дуб)
     materials.push_back(createMaterial(cmd, device, "assets/дуб.png",
                                        descriptor_pool, texture_descriptor_layout,
                                        texture_sampler));
     oak_material_id = materials.size() - 1;
-    std::cout << "Oak material ID: " << oak_material_id << std::endl;
 
-    // 3. Cobblestone (булыжник)
     materials.push_back(createMaterial(cmd, device, "assets/cobblestone.png",
                                        descriptor_pool, texture_descriptor_layout,
                                        texture_sampler));
     cobblestone_material_id = materials.size() - 1;
-    std::cout << "Cobblestone material ID: " << cobblestone_material_id << std::endl;
 
-    // 4. Grass (трава) - для земли
     materials.push_back(createMaterial(cmd, device, "assets/grass.png",
                                        descriptor_pool, texture_descriptor_layout,
                                        texture_sampler));
     grass_material_id = materials.size() - 1;
-    std::cout << "Grass material ID: " << grass_material_id << std::endl;
 
-    // 5. Lenna (для цилиндра)
     materials.push_back(createMaterial(cmd, device, "assets/lenna.png",
                                        descriptor_pool, texture_descriptor_layout,
                                        texture_sampler));
     size_t lenna_material_id = materials.size() - 1;
-    std::cout << "Lenna material ID: " << lenna_material_id << std::endl;
 
-    // Загружаем skybox текстуру
     materials.push_back(createMaterial(cmd, device, "assets/skybox.png",
                                        descriptor_pool, texture_descriptor_layout,
                                        skyboxsampler));
     size_t skybox_material_id = materials.size() - 1;
-    std::cout << "Skybox material ID: " << skybox_material_id << std::endl;
-    // 7. Glowstone (светящийся камень)
+
     materials.push_back(createMaterial(cmd, device, "assets/Glowstone.png",
                                        descriptor_pool, texture_descriptor_layout,
                                        texture_sampler));
     size_t glowstone_material_id = materials.size() - 1;
-    std::cout << "Glowstone material ID: " << glowstone_material_id << std::endl;
 
-    // 8. Magma (магма/лава)
     materials.push_back(createMaterial(cmd, device, "assets/magma.png",
                                        descriptor_pool, texture_descriptor_layout,
                                        texture_sampler));
     size_t magma_material_id = materials.size() - 1;
-    std::cout << "Magma material ID: " << magma_material_id << std::endl;
 
-    // 9. Water (вода)
     materials.push_back(createMaterial(cmd, device, "assets/water.png",
                                        descriptor_pool, texture_descriptor_layout,
                                        texture_sampler));
     size_t water_material_id = materials.size() - 1;
-    std::cout << "Water material ID: " << water_material_id << std::endl;
+
+    materials.push_back(createMaterialWithEmissive(
+    cmd, device,
+    "assets/others_0027_color_1k.png",       // albedo
+    "assets/others_0027_emissive_1k.png",
+    descriptor_pool,
+    texture_descriptor_layout,
+    texture_sampler
+    ));
+
+    size_t portal_material_id = materials.size() - 1;
+
 
 
 // Загружаем albedo текстуру из PNG
@@ -1053,7 +1103,7 @@ void initialize(VkCommandBuffer cmd) {
     }
 }
 
-// Создаём белую текстуру (заглушка для specular)
+// Создаём белую текстуру заглушка для specular
 {
     veekay::vec4 white = {1.0f, 1.0f, 1.0f, 1.0f};
     white_texture = new veekay::graphics::Texture(cmd, 1, 1,
@@ -1061,7 +1111,7 @@ void initialize(VkCommandBuffer cmd) {
                                                    &white);
 }
 
-// Создаём чёрную текстуру (заглушка для emissive)
+// Создаём чёрную текстуру заглушка для emissive
 {
     veekay::vec4 black = {0.0f, 0.0f, 0.0f, 1.0f};
     black_texture = new veekay::graphics::Texture(cmd, 1, 1,
@@ -1240,17 +1290,11 @@ void initialize(VkCommandBuffer cmd) {
         };
 
         std::vector<uint32_t> indices = {
-            // Front
             0, 1, 2, 2, 3, 0,
-            // Back
             4, 5, 6, 6, 7, 4,
-            // Top
             8, 9, 10, 10, 11, 8,
-            // Bottom
             12, 13, 14, 14, 15, 12,
-            // Right
             16, 17, 18, 18, 19, 16,
-            // Left
             20, 21, 22, 22, 23, 20,
         };
 
@@ -1349,7 +1393,7 @@ void initialize(VkCommandBuffer cmd) {
     }
 
 
-    // NOTE: Wall mesh (стена 4x3)
+    // NOTE: Wall mesh
 Mesh wall_mesh;
 {
     float wall_width = 4.0f;
@@ -1385,21 +1429,19 @@ Mesh wall_mesh;
     wall_mesh.indices = static_cast<uint32_t>(indices.size());
 }
 
-    // NOTE: Ground plane mesh - большой квадрат травы ниже пола
+    // NOTE: Ground plane mesh
     Mesh ground_mesh;
     {
-        float ground_size = 50.0f;  // Размер поляны (50x50)
-        float ground_height = 1.0f; // Высота блока
-        float ground_y = -2.0f;     // Ниже пола (floor на y=-2.0f)
+        float ground_size = 50.0f;
+        float ground_height = 1.0f;
+        float ground_y = -2.0f;
 
         std::vector<Vertex> vertices = {
-            // Top face (то, что видно - трава)
             {-ground_size/2, ground_y, ground_size/2, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f},
             {ground_size/2, ground_y, ground_size/2, 0.0f, 1.0f, 0.0f, 10.0f, 0.0f, 1.0f, 1.0f, 1.0f},
             {ground_size/2, ground_y, -ground_size/2, 0.0f, 1.0f, 0.0f, 10.0f, 10.0f, 1.0f, 1.0f, 1.0f},
             {-ground_size/2, ground_y, -ground_size/2, 0.0f, 1.0f, 0.0f, 0.0f, 10.0f, 1.0f, 1.0f, 1.0f},
 
-            // Bottom face (низ блока)
             {-ground_size/2, ground_y - ground_height, -ground_size/2, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f},
             {ground_size/2, ground_y - ground_height, -ground_size/2, 0.0f, -1.0f, 0.0f, 10.0f, 0.0f, 1.0f, 1.0f, 1.0f},
             {ground_size/2, ground_y - ground_height, ground_size/2, 0.0f, -1.0f, 0.0f, 10.0f, 10.0f, 1.0f, 1.0f, 1.0f},
@@ -1407,8 +1449,8 @@ Mesh wall_mesh;
         };
 
         std::vector<uint32_t> indices = {
-            0, 1, 2, 2, 3, 0,  // Top (трава)
-            4, 5, 6, 6, 7, 4,  // Bottom
+            0, 1, 2, 2, 3, 0,
+            4, 5, 6, 6, 7, 4,
         };
 
         ground_mesh.vertex_buffer = new veekay::graphics::Buffer(
@@ -1423,7 +1465,6 @@ Mesh wall_mesh;
     }
 
 
-// NOTE: Skybox mesh initialization - очень большой куб
 // NOTE: Skybox с правильными UV координатами для 4x3 layout
 Mesh skybox_mesh;
 {
@@ -1456,20 +1497,18 @@ std::vector<Vertex> vertices = {
     { size, -size,  size, 0.0f, -1.0f, 0.0f, 0.50f, 0.666f, 1.0f, 1.0f, 1.0f},
     {-size, -size,  size, 0.0f, -1.0f, 0.0f, 0.25f, 0.666f, 1.0f, 1.0f, 1.0f},
 
-    // Right face - колонка 3 (0.50 - 0.75) - ИСПРАВЛЕНО!
+    // Right face - колонка 3 (0.50 - 0.75)
     { size, -size,  size,  1.0f, 0.0f, 0.0f, 0.50f, 0.666f, 1.0f, 1.0f, 1.0f},
     { size, -size, -size,  1.0f, 0.0f, 0.0f, 0.75f, 0.666f, 1.0f, 1.0f, 1.0f},
     { size,  size, -size,  1.0f, 0.0f, 0.0f, 0.75f, 0.333f, 1.0f, 1.0f, 1.0f},
     { size,  size,  size,  1.0f, 0.0f, 0.0f, 0.50f, 0.333f, 1.0f, 1.0f, 1.0f},
 
-    // Left face - колонка 1 (0.0 - 0.25) - ИСПРАВЛЕНО!
+    // Left face - колонка 1 (0.0 - 0.25)
     {-size, -size, -size, -1.0f, 0.0f, 0.0f, 0.0f,  0.666f, 1.0f, 1.0f, 1.0f},
     {-size, -size,  size, -1.0f, 0.0f, 0.0f, 0.25f, 0.666f, 1.0f, 1.0f, 1.0f},
     {-size,  size,  size, -1.0f, 0.0f, 0.0f, 0.25f, 0.333f, 1.0f, 1.0f, 1.0f},
     {-size,  size, -size, -1.0f, 0.0f, 0.0f, 0.0f,  0.333f, 1.0f, 1.0f, 1.0f},
 };
-
-
 
     std::vector<uint32_t> indices = {
         0, 1, 2, 2, 3, 0,
@@ -1492,8 +1531,8 @@ std::vector<Vertex> vertices = {
 
 
 
-    // NOTE: Portal screen mesh - тонкая плоскость с водой (2x3 блока)
-    // NOTE: Portal screen mesh - тонкая плоскость с водой (2x3 блока)
+    //  Portal screen mesh
+
     Mesh portal_screen_mesh;
     {
         float screen_width = 2.0f;   // 2 блока в ширину
@@ -1532,7 +1571,7 @@ std::vector<Vertex> vertices = {
 
 
 
-// NOTE: Pillar mesh (столб 0.3x3x0.3)
+// NOTE: Pillar mesh
 Mesh pillar_mesh;
 {
     float width = 0.3f;
@@ -1583,57 +1622,28 @@ Mesh pillar_mesh;
 }
 
 
-    // NOTE: Add models to scene
-    models.emplace_back(Model{
-        .mesh = plane_mesh,
-        .transform = Transform{.position = {0.0f, 3.0f, 0.0f}},
-        .albedo_color = veekay::vec3{1.0f, 1.0f, 1.0f}
-    });
 
-    // NOTE: КУБА
-    models.emplace_back(Model{
-        .mesh = cube_mesh,
-        .transform = Transform{
-            .position = {2.0f, -0.5f, 0.0f},
-            .scale = {0.8f, 0.8f, 0.8f},
-        },
-        .albedo_color = veekay::vec3{0.9f, 0.2f, 0.2f}
-    });
 
-    // NOTE: ЦИЛИНДР
-    models.emplace_back(Model{
-        .mesh = cylinder_mesh,
-        .transform = Transform{
-            .position = {0.0f, -0.0f, 0.0f},
-        },
-        .albedo_color = veekay::vec3{0.8f, 0.8f, 0.8f}
-    });
-// ============================================
-// СОЗДАНИЕ МОДЕЛЕЙ
-// ============================================
+
 
 models.clear();
 
-    // ============================================
-    // ЦИЛИНДР (как было раньше) - с текстурой Lenna
-    // ============================================
+
     models.emplace_back(Model{
         .mesh = cylinder_mesh,
         .transform = Transform{
-            .position = {-3.0f, 1.0f, 0.0f},  // Слева от дома
+            .position = {-3.0f, 1.0f, 0.0f},
             .rotation = {0.0f, 0.0f, 0.0f}
         },
         .albedo_color = {1.0f, 1.0f, 1.0f},
         .material_id = 2
     });
 
-    // ============================================
-    // SKYBOX (рендерится первым, индекс 0)
-    // ============================================
+    // SKYBOX
     models.emplace_back(Model{
         .mesh = skybox_mesh,
         .transform = Transform{
-            .position = {0.0f, 0.0f, 0.0f},  // Центр мира
+            .position = {0.0f, 0.0f, 0.0f},
             .scale = {1.0f, 1.0f, 1.0f}
         },
         .albedo_color = {1.0f, 1.0f, 1.0f},
@@ -1643,67 +1653,68 @@ models.clear();
 
 
 
-    // КУБИК С ПРОЖЕКТОРОМ (возвращаем обратно)
-    models.emplace_back(Model{
-        .mesh = cube_mesh,
-        .transform = Transform{
-            .position = {2.0f, -0.5f, 0.0f},
-            .scale = {0.8f, 0.8f, 0.8f},
-        },
-        .albedo_color = {0.9f, 0.2f, 0.2f},
-        .material_id = grass_material_id  // Или любой другой материал
-    });
+    // models.emplace_back(Model{
+    //     .mesh = cube_mesh,
+    //     .transform = Transform{
+    //         .position = {2.0f, -0.5f, 0.0f},
+    //         .scale = {0.8f, 0.8f, 0.8f},
+    //     },
+    //     .albedo_color = {0.9f, 0.2f, 0.2f},
+    //     .material_id = grass_material_id  // Или любой другой материал
+    // });
 
-    // Позиция портала в мире (поднят на 1 блок выше)
     float portal_x = -8.0f;
-    float portal_y = 0.0f;  // ИЗМЕНЕНО: было 1.0f, теперь 0.0f (на 1 блок выше в Vulkan координатах)
+    float portal_y = 0.0f;
     float portal_z = 0.0f;
 
-    // 1. Нижняя перекладина (y=0, 4 блока в ширину) - СВЕТОКАМЕНЬ
     {
         Mesh mesh = createBox(0.0f, 0.0f, 0.0f, 4.0f, 1.0f, 1.0f);
         models.emplace_back(Model{
             .mesh = mesh,
             .transform = Transform{.position = {portal_x, portal_y, portal_z}},
             .albedo_color = {1.0f, 1.0f, 1.0f},
-            .material_id = glowstone_material_id,
+            // .material_id = glowstone_material_id,
+            .material_id = portal_material_id,
+
         });
     }
 
-    // 2. Верхняя перекладина (y=4, 4 блока в ширину) - СВЕТОКАМЕНЬ
     {
         Mesh mesh = createBox(0.0f, 0.0f, 0.0f, 4.0f, 1.0f, 1.0f);
         models.emplace_back(Model{
             .mesh = mesh,
             .transform = Transform{.position = {portal_x, portal_y + 4.0f, portal_z}},
             .albedo_color = {1.0f, 1.0f, 1.0f},
-            .material_id = glowstone_material_id,
+            // .material_id = glowstone_material_id,
+            .material_id = portal_material_id,
+
         });
     }
 
-    // 3. Левая колонна (x=0, y=1-3, 3 блока в высоту) - СВЕТОКАМЕНЬ
     {
         Mesh mesh = createBox(0.0f, 0.0f, 0.0f, 1.0f, 3.0f, 1.0f);
         models.emplace_back(Model{
             .mesh = mesh,
             .transform = Transform{.position = {portal_x, portal_y + 1.0f, portal_z}},
             .albedo_color = {1.0f, 1.0f, 1.0f},
-            .material_id = glowstone_material_id,
+            // .material_id = glowstone_material_id,
+            .material_id = portal_material_id,
+
         });
     }
 
-    // 4. Правая колонна (x=3, y=1-3, 3 блока в высоту) - СВЕТОКАМЕНЬ
     {
         Mesh mesh = createBox(0.0f, 0.0f, 0.0f, 1.0f, 3.0f, 1.0f);
         models.emplace_back(Model{
             .mesh = mesh,
             .transform = Transform{.position = {portal_x + 3.0f, portal_y + 1.0f, portal_z}},
             .albedo_color = {1.0f, 1.0f, 1.0f},
-            .material_id = glowstone_material_id,
+            // .material_id = glowstone_material_id,
+            .material_id = portal_material_id,
+
         });
     }
 
-    // 5. Экран портала (2x3 блока, в центре, с водой)
     models.emplace_back(Model{
         .mesh = portal_screen_mesh,
         .transform = Transform{.position = {portal_x + 1.0f, portal_y + 1.0f, portal_z + 0.4f}},
@@ -1712,14 +1723,12 @@ models.clear();
     });
 
     int cylindermodelindex = 1;
-  // ============================================
-// MINECRAFT ДОМ
-// ============================================
+
     models.emplace_back(Model{
         .mesh = ground_mesh,
         .transform = Transform{.position = {0.0f, +8.0f, 0.0f}},
         .albedo_color = {1.0f, 1.0f, 1.0f},
-        .material_id = grass_material_id,  // Используем текстуру травы
+        .material_id = grass_material_id,
     });
 // потолок
 {
@@ -1732,13 +1741,6 @@ models.clear();
     });
 }
 
-
-
-
-
-// СТЕНЫ (wood)
-
-// Левая стена (x=0) - сдвигаем по Z на +1
 {
     Mesh mesh = createBox(0.0f, 0.0f, 0.0f, 1.0f, 3.0f, 3.0f);
     models.emplace_back(Model{
@@ -1749,7 +1751,6 @@ models.clear();
     });
 }
 
-// Правая стена (x=4) - сдвигаем по Z на +1
 {
     Mesh mesh = createBox(0.0f, 0.0f, 0.0f, 1.0f, 3.0f, 3.0f);
     models.emplace_back(Model{
@@ -1760,7 +1761,6 @@ models.clear();
     });
 }
 
-// Задняя стена (z=0) - сдвигаем по X на +1
 {
     Mesh mesh = createBox(0.0f, 0.0f, 0.0f, 3.0f, 3.0f, 1.0f);
     models.emplace_back(Model{
@@ -1771,7 +1771,6 @@ models.clear();
     });
 }
 
-// Передняя стена (z=4) - сдвигаем по X на +1
 {
     Mesh mesh = createBox(0.0f, 0.0f, 0.0f, 3.0f, 3.0f, 1.0f);
     models.emplace_back(Model{
@@ -1782,9 +1781,7 @@ models.clear();
     });
 }
 
-// КОЛОННЫ (oak) - оставляем как есть
 
-// Левая передняя (0,1,0)
 {
     Mesh mesh = createBox(0.0f, 0.0f, 0.0f, 1.0f, 3.0f, 1.0f);
     models.emplace_back(Model{
@@ -1795,7 +1792,6 @@ models.clear();
     });
 }
 
-// Правая передняя (4,1,0)
 {
     Mesh mesh = createBox(0.0f, 0.0f, 0.0f, 1.0f, 3.0f, 1.0f);
     models.emplace_back(Model{
@@ -1806,7 +1802,6 @@ models.clear();
     });
 }
 
-// Левая задняя (0,1,4)
 {
     Mesh mesh = createBox(0.0f, 0.0f, 0.0f, 1.0f, 3.0f, 1.0f);
     models.emplace_back(Model{
@@ -1817,7 +1812,6 @@ models.clear();
     });
 }
 
-// Правая задняя (4,1,4)
 {
     Mesh mesh = createBox(0.0f, 0.0f, 0.0f, 1.0f, 3.0f, 1.0f);
     models.emplace_back(Model{
@@ -1828,7 +1822,7 @@ models.clear();
     });
 }
 
-// пол (oak)
+// пол
 {
     Mesh mesh = createBox(0.0f, 0.0f, 0.0f, 5.0f, 1.0f, 5.0f);
     models.emplace_back(Model{
@@ -1841,87 +1835,114 @@ models.clear();
 
 
 
-
 }
 
-// NOTE: Destroy resources here
 void shutdown() {
     VkDevice& device = veekay::app.vk_device;
 
-    // NOTE: Очистка материалов
-    for (auto& mat : materials) {
-        delete mat.emissive;
-        delete mat.specular;
-        delete mat.albedo;
+    // Собираем ВСЕ уникальные буферы из models (включая базовые)
+    std::unordered_set<veekay::graphics::Buffer*> allBuffers;
+    for (const auto& model : models) {
+        if (model.mesh.vertex_buffer) {
+            allBuffers.insert(model.mesh.vertex_buffer);
+        }
+        if (model.mesh.index_buffer) {
+            allBuffers.insert(model.mesh.index_buffer);
+        }
+    }
+
+    // Создаём set базовых мешей для проверки
+    std::unordered_set<veekay::graphics::Buffer*> baseMeshBuffers = {
+        cylinder_mesh.vertex_buffer,
+        cylinder_mesh.index_buffer,
+        cube_mesh.vertex_buffer,
+        cube_mesh.index_buffer,
+        plane_mesh.vertex_buffer,
+        plane_mesh.index_buffer
+    };
+
+    // Удаляем только динамические буферы
+    for (auto* buffer : allBuffers) {
+        if (baseMeshBuffers.find(buffer) == baseMeshBuffers.end()) {
+            delete buffer;  // Это удалит только динамически созданные буферы
+        }
+    }
+
+    models.clear();  // Очищаем вектор моделей
+
+
+    for (auto& material : materials) {
+        delete material.albedo;
+        delete material.specular;
+        delete material.emissive;
+        // VkDescriptorSet освобождается автоматически при уничтожении pool
     }
     materials.clear();
 
-    // NOTE: Очистка сэмплеров и текстур
+
     vkDestroySampler(device, texture_sampler, nullptr);
     vkDestroySampler(device, skyboxsampler, nullptr);
+
     delete black_texture;
     delete white_texture;
     delete albedo_texture;
+
+    black_texture = nullptr;
+    white_texture = nullptr;
+    albedo_texture = nullptr;
 
     vkDestroyDescriptorSetLayout(device, texture_descriptor_layout, nullptr);
 
     vkDestroySampler(device, missing_texture_sampler, nullptr);
     delete missing_texture;
+    missing_texture = nullptr;
 
-    // NOTE: Очистка базовых мешей
-    delete cylinder_mesh.index_buffer;
+
     delete cylinder_mesh.vertex_buffer;
+    delete cylinder_mesh.index_buffer;
+    cylinder_mesh.vertex_buffer = nullptr;
+    cylinder_mesh.index_buffer = nullptr;
 
-    delete cube_mesh.index_buffer;
     delete cube_mesh.vertex_buffer;
+    delete cube_mesh.index_buffer;
+    cube_mesh.vertex_buffer = nullptr;
+    cube_mesh.index_buffer = nullptr;
 
-    delete plane_mesh.index_buffer;
     delete plane_mesh.vertex_buffer;
+    delete plane_mesh.index_buffer;
+    plane_mesh.vertex_buffer = nullptr;
+    plane_mesh.index_buffer = nullptr;
 
-    // ============================================
-    // НОВОЕ: Очистка динамических мешей из models
-    // ============================================
-    // Используем unordered_set чтобы не удалять один и тот же буфер дважды
-    std::unordered_set<veekay::graphics::Buffer*> uniqueBuffers;
 
-    for (const auto& model : models) {
-        // Пропускаем базовые меши, которые мы уже удаляем выше
-        if (model.mesh.vertex_buffer != cylinder_mesh.vertex_buffer &&
-            model.mesh.vertex_buffer != cube_mesh.vertex_buffer &&
-            model.mesh.vertex_buffer != plane_mesh.vertex_buffer) {
-            uniqueBuffers.insert(model.mesh.vertex_buffer);
-            uniqueBuffers.insert(model.mesh.index_buffer);
-        }
-    }
-
-    // NOTE: Удаляем уникальные буферы
-    for (auto* buffer : uniqueBuffers) {
-        delete buffer;
-    }
-
-    models.clear();
-
-    // NOTE: Очистка буферов uniform
     delete model_uniforms_buffer;
     delete scene_uniforms_buffer;
     delete spot_lights_buffer;
 
-    // NOTE: Очистка дескрипторов
+    model_uniforms_buffer = nullptr;
+    scene_uniforms_buffer = nullptr;
+    spot_lights_buffer = nullptr;
+
+
+
     vkDestroyDescriptorSetLayout(device, descriptor_set_layout, nullptr);
     vkDestroyDescriptorPool(device, descriptor_pool, nullptr);
 
-    // NOTE: Очистка пайплайна и шейдеров
+
+
     vkDestroyPipeline(device, pipeline, nullptr);
     vkDestroyPipelineLayout(device, pipeline_layout, nullptr);
     vkDestroyShaderModule(device, fragment_shader_module, nullptr);
     vkDestroyShaderModule(device, vertex_shader_module, nullptr);
 }
 
+
 void update(double time) {
     ImGui::Begin("Controls & Lighting:");
     ImGui::SetWindowSize(ImVec2(400, 500), ImGuiCond_FirstUseEver);
-
-    // NOTE: КАТЕГОРИЯ: Анимация
+    if (ImGui::Button("Exit Application")) {
+        veekay::app.running = false;
+    }
+    ImGui::Separator();
     ImGui::SeparatorText("Animation");
     ImGui::SliderFloat("Trajectory Radius##traj", &trajectory_radius, 0.1f, 3.0f);
     ImGui::SliderFloat("Animation Speed##speed", &animation_speed, 0.1f, 5.0f);
@@ -1930,16 +1951,13 @@ void update(double time) {
         animation_direction *= -1;
     }
 
-    // NOTE: КАТЕГОРИЯ: Ambient свет
     ImGui::SeparatorText("Ambient Light");
     ImGui::ColorEdit3("Ambient Color##amb", (float*)&lighting_params.ambient_color);
 
-    // NOTE: КАТЕГОРИЯ: Directional свет (солнце)
     ImGui::SeparatorText("Directional Light (Sun)");
     ImGui::SliderFloat3("Sun Direction##dir", (float*)&lighting_params.directional_direction, -1.0f, 1.0f);
     ImGui::ColorEdit3("Sun Color##sun", (float*)&lighting_params.directional_color);
 
-    // NOTE: КАТЕГОРИЯ: Spot Light
     ImGui::SeparatorText("Spot Light (Projector)");
     ImGui::SliderFloat3("Spot Position##spos", (float*)&lighting_params.spot_light.position, -10.0f, 10.0f);
     ImGui::SliderFloat3("Spot Direction##sdir", (float*)&lighting_params.spot_light.direction, -1.0f, 1.0f);
@@ -1951,12 +1969,10 @@ void update(double time) {
 
     ImGui::End();
 
-    // NOTE: Вычисляем delta_time для анимации
     static double last_time = 0.0;
     double delta_time = time - last_time;
     last_time = time;
 
-    // NOTE: Обновляем время анимации
     if (!animation_paused) {
         animation_time += (float)delta_time * animation_speed * animation_direction;
     } else {
@@ -1969,9 +1985,7 @@ void update(double time) {
     float x = trajectory_radius * cos(t) / denominator;
     float z = trajectory_radius * sin(t) * cos(t) / denominator;
 
-    // ============================================
-    // НОВОЕ: Применяем позицию к ЦИЛИНДРУ (индекс 0)
-    // ============================================
+    // Применяем позицию к ЦИЛИНДРУ (индекс 0)
     if (models.size() > cylinder_model_index) {
         models[cylinder_model_index].transform.position = {x, 1.0f, z};  // Y=1 чтобы был над полом
 
@@ -2035,9 +2049,7 @@ void update(double time) {
     // NOTE: Копируем в GPU буфер
     *(SceneUniforms*)scene_uniforms_buffer->mapped_region = scene_uniforms;
 
-    // ============================================
-    // НОВОЕ: Находим индекс кубика с прожектором
-    // ============================================
+
     size_t cube_index = models.size() - 1;  // Последний объект (кубик)
 
     if (models.size() > cube_index) {
@@ -2077,9 +2089,6 @@ void update(double time) {
         *(SpotLightsBuffer*)spot_lights_buffer->mapped_region = spot_lights_data;
     }
 
-    // ============================================
-    // НОВОЕ: Заполняем ModelUniforms с учётом материалов
-    // ============================================
     std::vector<ModelUniforms> model_uniforms(models.size());
     for (size_t i = 0, n = models.size(); i < n; ++i) {
         const Model& model = models[i];
@@ -2093,9 +2102,7 @@ void update(double time) {
         uniforms._pad2 = model.isSkybox ? 1.0f : 0.0f;
 
 
-        // ============================================
         // НОВОЕ: Устанавливаем материалы в зависимости от ID
-        // ============================================
         if (model.material_id == cobblestone_material_id) {
             // Булыжник: матовый
             uniforms.specular_color = {0.2f, 0.2f, 0.2f};
@@ -2112,7 +2119,7 @@ void update(double time) {
             uniforms.shininess = 64.0f;
         }
         else if (i == cylinder_model_index) {
-            // Цилиндр (Lenna): блестящий
+            // Цилиндр блестящий
             uniforms.specular_color = {1.0f, 1.0f, 1.0f};
             uniforms.shininess = 128.0f;
         }
@@ -2206,7 +2213,6 @@ void render(VkCommandBuffer cmd, VkFramebuffer framebuffer) {
     for (size_t i = 0, n = models.size(); i < n; ++i) {
         const Model& model = models[i];
 
-        // Рендерим ТОЛЬКО скайбокс
         if (!model.isSkybox) continue;
 
         const Mesh& mesh = model.mesh;

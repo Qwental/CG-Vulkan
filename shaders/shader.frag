@@ -27,7 +27,7 @@ layout (binding = 1, std140) uniform ModelUniforms {
     vec3 specular_color;
     float _pad1_m;
     float shininess;
-    float is_skybox;  // <-- переименовали pad2
+    float is_skybox;
     float _pad3_m;
     float _pad4_m;
 };
@@ -89,18 +89,12 @@ void main() {
     vec3 Kd = albedo_tex * albedo_color;
     vec3 Ks = specular_tex * specular_color;
 
-    // ============================================
-    // НОВОЕ: Для скайбокса - только текстура
-    // ============================================
+
     if (is_skybox > 0.5) {
-        // Режим "unlit" - только альбедо текстура
         final_color = vec4(albedo_tex, 1.0);
         return;
     }
 
-    // ============================================
-    // Для обычных объектов - полный расчет освещения
-    // ============================================
     vec3 N = normalize(f_normal);
     vec3 V = normalize(view_position - f_position);
     vec3 L = normalize(sun_light_direction);

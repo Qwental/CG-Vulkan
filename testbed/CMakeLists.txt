@@ -7,9 +7,31 @@ add_executable(${PROJECT_NAME} main.cpp)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD_REQUIRED TRUE CXX_STANDARD 20)
 
+# ===== SANITIZERS (AddressSanitizer + LeakSanitizer) =====
+# Работает на macOS, Linux, Windows (Clang/GCC)
+if(CMAKE_BUILD_TYPE MATCHES "Debug")
+	if(APPLE OR UNIX)
+		# AddressSanitizer для обнаружения утечек памяти и ошибок доступа
+		target_compile_options(${PROJECT_NAME} PRIVATE
+				-fsanitize=address
+				-fsanitize=undefined
+				-fno-omit-frame-pointer
+				-g
+		)
+		target_link_options(${PROJECT_NAME} PRIVATE
+				-fsanitize=address
+				-fsanitize=undefined
+		)
+	endif()
+endif()
+
 if(MSVC)
 	target_compile_options(${PROJECT_NAME} PRIVATE /wd4201)
 	target_compile_definitions(${PROJECT_NAME} PRIVATE -D_USE_MATH_DEFINES)
+
+	if(CMAKE_BUILD_TYPE MATCHES "Debug")
+		target_compile_options(${PROJECT_NAME} PRIVATE /fsanitize=address)
+	endif()
 endif()
 
 find_package(Vulkan REQUIRED)
