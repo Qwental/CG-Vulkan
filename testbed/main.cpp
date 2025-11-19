@@ -438,99 +438,6 @@ Material createMaterial(VkCommandBuffer cmd, VkDevice device,
 }
 
 
-Material createMaterialWithEmissive(
-    VkCommandBuffer cmd, VkDevice device,
-    const char* albedo_path,
-    const char* emissive_path,
-    VkDescriptorPool pool,
-    VkDescriptorSetLayout layout,
-    VkSampler sampler)
-{
-    Material mat;
-
-    // Загрузка albedo текстуры
-    std::vector<uint8_t> pixels;
-    unsigned int width, height;
-    unsigned int error = lodepng::decode(pixels, width, height, albedo_path);
-
-    if (error) {
-        std::cerr << "Failed to load " << albedo_path << ": "
-                  << lodepng_error_text(error) << "\n";
-        uint32_t fallback[] = {0xffff00ff, 0xff000000, 0xff000000, 0xffff00ff};
-        mat.albedo = new veekay::graphics::Texture(cmd, 2, 2, VK_FORMAT_R8G8B8A8_UNORM, fallback);
-    } else {
-        mat.albedo = new veekay::graphics::Texture(cmd, width, height, VK_FORMAT_R8G8B8A8_UNORM, pixels.data());
-    }
-
-    // Создаём белую specular текстуру (как заглушку)
-    veekay::vec4 white = {1.0f, 1.0f, 1.0f, 1.0f};
-    mat.specular = new veekay::graphics::Texture(cmd, 1, 1, VK_FORMAT_R32G32B32A32_SFLOAT, &white);
-
-    // Загрузка emissive текстуры
-    error = lodepng::decode(pixels, width, height, emissive_path);
-    if (error) {
-        std::cerr << "Failed to load " << emissive_path << ": "
-                  << lodepng_error_text(error) << "\n";
-        // fallback на чёрную текстуру
-        veekay::vec4 black = {0.0f, 0.0f, 0.0f, 1.0f};
-        mat.emissive = new veekay::graphics::Texture(cmd, 1, 1, VK_FORMAT_R32G32B32A32_SFLOAT, &black);
-    } else {
-        mat.emissive = new veekay::graphics::Texture(cmd, width, height, VK_FORMAT_R8G8B8A8_UNORM, pixels.data());
-    }
-
-    // Выделяем descriptor set
-    VkDescriptorSetAllocateInfo info{
-        .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
-        .descriptorPool = pool,
-        .descriptorSetCount = 1,
-        .pSetLayouts = &layout,
-    };
-
-    if (vkAllocateDescriptorSets(device, &info, &mat.descriptor_set) != VK_SUCCESS) {
-        std::cerr << "Failed to allocate material descriptor set\n";
-        return mat;
-    }
-
-    // Обновляем descriptor set
-    VkDescriptorImageInfo image_infos[] = {
-        {.sampler = sampler,
-         .imageView = mat.albedo->view,
-         .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL},
-        {.sampler = sampler,
-         .imageView = mat.specular->view,
-         .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL},
-        {.sampler = sampler,
-         .imageView = mat.emissive->view,
-         .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL},
-    };
-
-    VkWriteDescriptorSet writes[] = {
-        {.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-         .dstSet = mat.descriptor_set,
-         .dstBinding = 0,
-         .descriptorCount = 1,
-         .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-         .pImageInfo = &image_infos[0]},
-        {.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-         .dstSet = mat.descriptor_set,
-         .dstBinding = 1,
-         .descriptorCount = 1,
-         .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-         .pImageInfo = &image_infos[1]},
-        {.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-         .dstSet = mat.descriptor_set,
-         .dstBinding = 2,
-         .descriptorCount = 1,
-         .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-         .pImageInfo = &image_infos[2]},
-    };
-
-    vkUpdateDescriptorSets(device, 3, writes, 0, nullptr);
-
-    return mat;
-}
-
-
 
 Mesh createBox(float x_min, float y_min, float z_min,
                float width, float height, float depth) {
@@ -1065,16 +972,7 @@ void initialize(VkCommandBuffer cmd) {
                                        texture_sampler));
     size_t water_material_id = materials.size() - 1;
 
-    materials.push_back(createMaterialWithEmissive(
-    cmd, device,
-    "assets/others_0027_color_1k.png",       // albedo
-    "assets/others_0027_emissive_1k.png",
-    descriptor_pool,
-    texture_descriptor_layout,
-    texture_sampler
-    ));
 
-    size_t portal_material_id = materials.size() - 1;
 
 
 
@@ -1673,8 +1571,7 @@ models.clear();
             .mesh = mesh,
             .transform = Transform{.position = {portal_x, portal_y, portal_z}},
             .albedo_color = {1.0f, 1.0f, 1.0f},
-            // .material_id = glowstone_material_id,
-            .material_id = portal_material_id,
+             .material_id = glowstone_material_id,
 
         });
     }
@@ -1685,8 +1582,7 @@ models.clear();
             .mesh = mesh,
             .transform = Transform{.position = {portal_x, portal_y + 4.0f, portal_z}},
             .albedo_color = {1.0f, 1.0f, 1.0f},
-            // .material_id = glowstone_material_id,
-            .material_id = portal_material_id,
+             .material_id = glowstone_material_id,
 
         });
     }
@@ -1697,8 +1593,7 @@ models.clear();
             .mesh = mesh,
             .transform = Transform{.position = {portal_x, portal_y + 1.0f, portal_z}},
             .albedo_color = {1.0f, 1.0f, 1.0f},
-            // .material_id = glowstone_material_id,
-            .material_id = portal_material_id,
+             .material_id = glowstone_material_id,
 
         });
     }
@@ -1709,8 +1604,7 @@ models.clear();
             .mesh = mesh,
             .transform = Transform{.position = {portal_x + 3.0f, portal_y + 1.0f, portal_z}},
             .albedo_color = {1.0f, 1.0f, 1.0f},
-            // .material_id = glowstone_material_id,
-            .material_id = portal_material_id,
+             .material_id = glowstone_material_id,
 
         });
     }
