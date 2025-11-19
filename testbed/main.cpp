@@ -915,7 +915,7 @@ void initialize(VkCommandBuffer cmd) {
             .magFilter = VK_FILTER_LINEAR,          // LINEAR вместо NEAREST для гладких переходов
             .minFilter = VK_FILTER_LINEAR,          // LINEAR вместо NEAREST
             .mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR,
-            .addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE, // CLAMP вместо REPEAT
+            .addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
             .addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE, // CLAMP вместо REPEAT
             .addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE, // CLAMP вместо REPEAT
             .maxAnisotropy = 1.0f,
