@@ -1,0 +1,1953 @@
+/Users/vladimirbugrenkov/education/CG/veekay/cmake-build-debug/testbed/testbed
+Shadow pipeline created successfully
+Shadow map created successfully: 4096x4096
+Wood material ID: 0
+Oak material ID: 1
+Cobblestone material ID: 2
+Grass material ID: 3
+Lenna material ID: 4
+Failed to load assets/lenna.png: failed to open file for reading
+Skybox material ID: 5
+Glowstone material ID: 6
+leaves_material_id material ID: 7
+Water material ID: 8
+
+=== SCENE SETUP (first frame) ===
+Min: (-20, -8, -20)
+Max: (22, 8, 14)
+Center: (1, 0, -3)
+Radius: 25.2
+
+========== SHADOW PASS START (call #1) ==========
+Total models: 825
+Model 0: pos(0.01, 1.00, 0.01) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+Validation Error: [ SYNC-HAZARD-READ-AFTER-WRITE ] | MessageID = 0xe4d96472
+vkCmdBeginRenderPass(): READ_AFTER_WRITE hazard detected: attachment loadOp access is not synchronized with the attachment layout transition. vkCmdBeginRenderPass reads the color aspect of attachment 0 in subpass 0 (VkImageView 0x70000000007, loadOp VK_ATTACHMENT_LOAD_OP_LOAD), which was previously written during an image layout transition initiated by the same command.
+The current synchronization allows VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT accesses at VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, but to prevent this hazard, it must allow VK_ACCESS_2_COLOR_ATTACHMENT_READ_BIT accesses at VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT.
+Objects: 1
+    [0] VkRenderPass 0xb000000000b
+
+[ERROR: Validation] - SYNC-HAZARD-READ-AFTER-WRITE
+vkCmdBeginRenderPass(): READ_AFTER_WRITE hazard detected: attachment loadOp access is not synchronized with the attachment layout transition. vkCmdBeginRenderPass reads the color aspect of attachment 0 in subpass 0 (VkImageView 0x70000000007, loadOp VK_ATTACHMENT_LOAD_OP_LOAD), which was previously written during an image layout transition initiated by the same command.
+The current synchronization allows VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT accesses at VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, but to prevent this hazard, it must allow VK_ACCESS_2_COLOR_ATTACHMENT_READ_BIT accesses at VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT.
+Validation Error: [ SYNC-HAZARD-WRITE-AFTER-READ ] | MessageID = 0x376bc9df
+vkQueueSubmit(): WRITE_AFTER_READ hazard detected. vkCmdBeginRenderPass (from VkCommandBuffer 0x14b824a78 submitted on the current VkQueue 0x14a612b78) writes to resource, which was previously read by vkAcquireNextImageKHR.
+The current synchronization defines the destination stage mask as VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, but layout transition does not synchronize with these stages.
+Vulkan insight: If the layout transition is done via an image barrier, consider including VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT in srcStageMask. If the transition occurs as part of the render pass begin operation, consider specifying an external subpass dependency (VK_SUBPASS_EXTERNAL) with srcStageMask that includes VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, or perform the transition in a separate image barrier before the render pass begins.
+Vulkan insight: an execution dependency is sufficient to prevent this hazard.
+Objects: 2
+    [0] VkQueue 0x14a612b78
+    [1] VkCommandBuffer 0x14b824a78
+
+[ERROR: Validation] - SYNC-HAZARD-WRITE-AFTER-READ
+vkQueueSubmit(): WRITE_AFTER_READ hazard detected. vkCmdBeginRenderPass (from VkCommandBuffer 0x14b824a78 submitted on the current VkQueue 0x14a612b78) writes to resource, which was previously read by vkAcquireNextImageKHR.
+The current synchronization defines the destination stage mask as VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, but layout transition does not synchronize with these stages.
+Vulkan insight: If the layout transition is done via an image barrier, consider including VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT in srcStageMask. If the transition occurs as part of the render pass begin operation, consider specifying an external subpass dependency (VK_SUBPASS_EXTERNAL) with srcStageMask that includes VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, or perform the transition in a separate image barrier before the render pass begins.
+Vulkan insight: an execution dependency is sufficient to prevent this hazard.
+
+========== SHADOW PASS START (call #2) ==========
+Total models: 825
+Model 0: pos(-0.01, 1.00, -0.01) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+Validation Error: [ SYNC-HAZARD-READ-AFTER-WRITE ] | MessageID = 0xe4d96472
+vkCmdBeginRenderPass(): READ_AFTER_WRITE hazard detected: attachment loadOp access is not synchronized with the attachment layout transition. vkCmdBeginRenderPass reads the color aspect of attachment 0 in subpass 0 (VkImageView 0x80000000008, loadOp VK_ATTACHMENT_LOAD_OP_LOAD), which was previously written during an image layout transition initiated by the same command.
+The current synchronization allows VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT accesses at VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, but to prevent this hazard, it must allow VK_ACCESS_2_COLOR_ATTACHMENT_READ_BIT accesses at VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT.
+Objects: 1
+    [0] VkRenderPass 0xb000000000b
+
+[ERROR: Validation] - SYNC-HAZARD-READ-AFTER-WRITE
+vkCmdBeginRenderPass(): READ_AFTER_WRITE hazard detected: attachment loadOp access is not synchronized with the attachment layout transition. vkCmdBeginRenderPass reads the color aspect of attachment 0 in subpass 0 (VkImageView 0x80000000008, loadOp VK_ATTACHMENT_LOAD_OP_LOAD), which was previously written during an image layout transition initiated by the same command.
+The current synchronization allows VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT accesses at VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, but to prevent this hazard, it must allow VK_ACCESS_2_COLOR_ATTACHMENT_READ_BIT accesses at VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT.
+Validation Error: [ SYNC-HAZARD-WRITE-AFTER-READ ] | MessageID = 0x376bc9df
+vkQueueSubmit(): WRITE_AFTER_READ hazard detected. vkCmdBeginRenderPass (from VkCommandBuffer 0x14b824bb8 submitted on the current VkQueue 0x14a612b78) writes to resource, which was previously read by vkAcquireNextImageKHR.
+The current synchronization defines the destination stage mask as VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, but layout transition does not synchronize with these stages.
+Vulkan insight: If the layout transition is done via an image barrier, consider including VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT in srcStageMask. If the transition occurs as part of the render pass begin operation, consider specifying an external subpass dependency (VK_SUBPASS_EXTERNAL) with srcStageMask that includes VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, or perform the transition in a separate image barrier before the render pass begins.
+Vulkan insight: an execution dependency is sufficient to prevent this hazard.
+Objects: 2
+    [0] VkQueue 0x14a612b78
+    [1] VkCommandBuffer 0x14b824bb8
+
+[ERROR: Validation] - SYNC-HAZARD-WRITE-AFTER-READ
+vkQueueSubmit(): WRITE_AFTER_READ hazard detected. vkCmdBeginRenderPass (from VkCommandBuffer 0x14b824bb8 submitted on the current VkQueue 0x14a612b78) writes to resource, which was previously read by vkAcquireNextImageKHR.
+The current synchronization defines the destination stage mask as VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, but layout transition does not synchronize with these stages.
+Vulkan insight: If the layout transition is done via an image barrier, consider including VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT in srcStageMask. If the transition occurs as part of the render pass begin operation, consider specifying an external subpass dependency (VK_SUBPASS_EXTERNAL) with srcStageMask that includes VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, or perform the transition in a separate image barrier before the render pass begins.
+Vulkan insight: an execution dependency is sufficient to prevent this hazard.
+
+========== SHADOW PASS START (call #3) ==========
+Total models: 825
+Model 0: pos(-0.01, 1.00, -0.01) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+Validation Error: [ SYNC-HAZARD-READ-AFTER-WRITE ] | MessageID = 0xe4d96472
+vkCmdBeginRenderPass(): READ_AFTER_WRITE hazard detected: attachment loadOp access is not synchronized with the attachment layout transition. vkCmdBeginRenderPass reads the color aspect of attachment 0 in subpass 0 (VkImageView 0x90000000009, loadOp VK_ATTACHMENT_LOAD_OP_LOAD), which was previously written during an image layout transition initiated by the same command.
+The current synchronization allows VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT accesses at VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, but to prevent this hazard, it must allow VK_ACCESS_2_COLOR_ATTACHMENT_READ_BIT accesses at VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT.
+Objects: 1
+    [0] VkRenderPass 0xb000000000b
+
+[ERROR: Validation] - SYNC-HAZARD-READ-AFTER-WRITE
+vkCmdBeginRenderPass(): READ_AFTER_WRITE hazard detected: attachment loadOp access is not synchronized with the attachment layout transition. vkCmdBeginRenderPass reads the color aspect of attachment 0 in subpass 0 (VkImageView 0x90000000009, loadOp VK_ATTACHMENT_LOAD_OP_LOAD), which was previously written during an image layout transition initiated by the same command.
+The current synchronization allows VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT accesses at VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, but to prevent this hazard, it must allow VK_ACCESS_2_COLOR_ATTACHMENT_READ_BIT accesses at VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT.
+Validation Error: [ SYNC-HAZARD-WRITE-AFTER-READ ] | MessageID = 0x376bc9df
+vkQueueSubmit(): WRITE_AFTER_READ hazard detected. vkCmdBeginRenderPass (from VkCommandBuffer 0x14b824cf8 submitted on the current VkQueue 0x14a612b78) writes to resource, which was previously read by vkAcquireNextImageKHR.
+The current synchronization defines the destination stage mask as VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, but layout transition does not synchronize with these stages.
+Vulkan insight: If the layout transition is done via an image barrier, consider including VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT in srcStageMask. If the transition occurs as part of the render pass begin operation, consider specifying an external subpass dependency (VK_SUBPASS_EXTERNAL) with srcStageMask that includes VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, or perform the transition in a separate image barrier before the render pass begins.
+Vulkan insight: an execution dependency is sufficient to prevent this hazard.
+Objects: 2
+    [0] VkQueue 0x14a612b78
+    [1] VkCommandBuffer 0x14b824cf8
+
+[ERROR: Validation] - SYNC-HAZARD-WRITE-AFTER-READ
+vkQueueSubmit(): WRITE_AFTER_READ hazard detected. vkCmdBeginRenderPass (from VkCommandBuffer 0x14b824cf8 submitted on the current VkQueue 0x14a612b78) writes to resource, which was previously read by vkAcquireNextImageKHR.
+The current synchronization defines the destination stage mask as VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, but layout transition does not synchronize with these stages.
+Vulkan insight: If the layout transition is done via an image barrier, consider including VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT in srcStageMask. If the transition occurs as part of the render pass begin operation, consider specifying an external subpass dependency (VK_SUBPASS_EXTERNAL) with srcStageMask that includes VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, or perform the transition in a separate image barrier before the render pass begins.
+Vulkan insight: an execution dependency is sufficient to prevent this hazard.
+
+========== SHADOW PASS START (call #4) ==========
+Total models: 825
+Model 0: pos(-0.02, 1.00, -0.02) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+Validation Error: [ SYNC-HAZARD-READ-AFTER-WRITE ] | MessageID = 0xe4d96472
+vkCmdBeginRenderPass(): READ_AFTER_WRITE hazard detected: attachment loadOp access is not synchronized with the attachment layout transition. vkCmdBeginRenderPass reads the color aspect of attachment 0 in subpass 0 (VkImageView 0x70000000007, loadOp VK_ATTACHMENT_LOAD_OP_LOAD), which was previously written during an image layout transition initiated by the same command.
+The current synchronization allows VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT accesses at VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, but to prevent this hazard, it must allow VK_ACCESS_2_COLOR_ATTACHMENT_READ_BIT accesses at VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT.
+Objects: 1
+    [0] VkRenderPass 0xb000000000b
+
+[ERROR: Validation] - SYNC-HAZARD-READ-AFTER-WRITE
+vkCmdBeginRenderPass(): READ_AFTER_WRITE hazard detected: attachment loadOp access is not synchronized with the attachment layout transition. vkCmdBeginRenderPass reads the color aspect of attachment 0 in subpass 0 (VkImageView 0x70000000007, loadOp VK_ATTACHMENT_LOAD_OP_LOAD), which was previously written during an image layout transition initiated by the same command.
+The current synchronization allows VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT accesses at VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, but to prevent this hazard, it must allow VK_ACCESS_2_COLOR_ATTACHMENT_READ_BIT accesses at VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT.
+Validation Error: [ SYNC-HAZARD-WRITE-AFTER-READ ] | MessageID = 0x376bc9df
+vkQueueSubmit(): WRITE_AFTER_READ hazard detected. vkCmdBeginRenderPass (from VkCommandBuffer 0x14b824a78 submitted on the current VkQueue 0x14a612b78) writes to resource, which was previously read by vkAcquireNextImageKHR.
+The current synchronization defines the destination stage mask as VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, but layout transition does not synchronize with these stages.
+Vulkan insight: If the layout transition is done via an image barrier, consider including VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT in srcStageMask. If the transition occurs as part of the render pass begin operation, consider specifying an external subpass dependency (VK_SUBPASS_EXTERNAL) with srcStageMask that includes VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, or perform the transition in a separate image barrier before the render pass begins.
+Vulkan insight: an execution dependency is sufficient to prevent this hazard.
+Objects: 2
+    [0] VkQueue 0x14a612b78
+    [1] VkCommandBuffer 0x14b824a78
+
+[ERROR: Validation] - SYNC-HAZARD-WRITE-AFTER-READ
+vkQueueSubmit(): WRITE_AFTER_READ hazard detected. vkCmdBeginRenderPass (from VkCommandBuffer 0x14b824a78 submitted on the current VkQueue 0x14a612b78) writes to resource, which was previously read by vkAcquireNextImageKHR.
+The current synchronization defines the destination stage mask as VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, but layout transition does not synchronize with these stages.
+Vulkan insight: If the layout transition is done via an image barrier, consider including VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT in srcStageMask. If the transition occurs as part of the render pass begin operation, consider specifying an external subpass dependency (VK_SUBPASS_EXTERNAL) with srcStageMask that includes VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, or perform the transition in a separate image barrier before the render pass begins.
+Vulkan insight: an execution dependency is sufficient to prevent this hazard.
+
+========== SHADOW PASS START (call #5) ==========
+Total models: 825
+Model 0: pos(-0.04, 1.00, -0.04) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+Validation Error: [ SYNC-HAZARD-READ-AFTER-WRITE ] | MessageID = 0xe4d96472
+vkCmdBeginRenderPass(): READ_AFTER_WRITE hazard detected: attachment loadOp access is not synchronized with the attachment layout transition. vkCmdBeginRenderPass reads the color aspect of attachment 0 in subpass 0 (VkImageView 0x80000000008, loadOp VK_ATTACHMENT_LOAD_OP_LOAD), which was previously written during an image layout transition initiated by the same command.
+The current synchronization allows VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT accesses at VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, but to prevent this hazard, it must allow VK_ACCESS_2_COLOR_ATTACHMENT_READ_BIT accesses at VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT.
+Objects: 1
+    [0] VkRenderPass 0xb000000000b
+
+[ERROR: Validation] - SYNC-HAZARD-READ-AFTER-WRITE
+vkCmdBeginRenderPass(): READ_AFTER_WRITE hazard detected: attachment loadOp access is not synchronized with the attachment layout transition. vkCmdBeginRenderPass reads the color aspect of attachment 0 in subpass 0 (VkImageView 0x80000000008, loadOp VK_ATTACHMENT_LOAD_OP_LOAD), which was previously written during an image layout transition initiated by the same command.
+The current synchronization allows VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT accesses at VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, but to prevent this hazard, it must allow VK_ACCESS_2_COLOR_ATTACHMENT_READ_BIT accesses at VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT.
+Validation Error: [ SYNC-HAZARD-WRITE-AFTER-READ ] | MessageID = 0x376bc9df
+vkQueueSubmit(): WRITE_AFTER_READ hazard detected. vkCmdBeginRenderPass (from VkCommandBuffer 0x14b824bb8 submitted on the current VkQueue 0x14a612b78) writes to resource, which was previously read by vkAcquireNextImageKHR.
+The current synchronization defines the destination stage mask as VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, but layout transition does not synchronize with these stages.
+Vulkan insight: If the layout transition is done via an image barrier, consider including VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT in srcStageMask. If the transition occurs as part of the render pass begin operation, consider specifying an external subpass dependency (VK_SUBPASS_EXTERNAL) with srcStageMask that includes VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, or perform the transition in a separate image barrier before the render pass begins.
+Vulkan insight: an execution dependency is sufficient to prevent this hazard.
+Objects: 2
+    [0] VkQueue 0x14a612b78
+    [1] VkCommandBuffer 0x14b824bb8
+
+[ERROR: Validation] - SYNC-HAZARD-WRITE-AFTER-READ
+vkQueueSubmit(): WRITE_AFTER_READ hazard detected. vkCmdBeginRenderPass (from VkCommandBuffer 0x14b824bb8 submitted on the current VkQueue 0x14a612b78) writes to resource, which was previously read by vkAcquireNextImageKHR.
+The current synchronization defines the destination stage mask as VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, but layout transition does not synchronize with these stages.
+Vulkan insight: If the layout transition is done via an image barrier, consider including VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT in srcStageMask. If the transition occurs as part of the render pass begin operation, consider specifying an external subpass dependency (VK_SUBPASS_EXTERNAL) with srcStageMask that includes VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, or perform the transition in a separate image barrier before the render pass begins.
+Vulkan insight: an execution dependency is sufficient to prevent this hazard.
+
+========== SHADOW PASS START (call #6) ==========
+Total models: 825
+Model 0: pos(-0.05, 1.00, -0.05) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+Validation Error: [ SYNC-HAZARD-READ-AFTER-WRITE ] | MessageID = 0xe4d96472
+vkCmdBeginRenderPass(): READ_AFTER_WRITE hazard detected: attachment loadOp access is not synchronized with the attachment layout transition. vkCmdBeginRenderPass reads the color aspect of attachment 0 in subpass 0 (VkImageView 0x90000000009, loadOp VK_ATTACHMENT_LOAD_OP_LOAD), which was previously written during an image layout transition initiated by the same command.
+The current synchronization allows VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT accesses at VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, but to prevent this hazard, it must allow VK_ACCESS_2_COLOR_ATTACHMENT_READ_BIT accesses at VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT.
+Objects: 1
+    [0] VkRenderPass 0xb000000000b
+
+[ERROR: Validation] - SYNC-HAZARD-READ-AFTER-WRITE
+vkCmdBeginRenderPass(): READ_AFTER_WRITE hazard detected: attachment loadOp access is not synchronized with the attachment layout transition. vkCmdBeginRenderPass reads the color aspect of attachment 0 in subpass 0 (VkImageView 0x90000000009, loadOp VK_ATTACHMENT_LOAD_OP_LOAD), which was previously written during an image layout transition initiated by the same command.
+The current synchronization allows VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT accesses at VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, but to prevent this hazard, it must allow VK_ACCESS_2_COLOR_ATTACHMENT_READ_BIT accesses at VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT.
+Validation Error: [ SYNC-HAZARD-WRITE-AFTER-READ ] | MessageID = 0x376bc9df
+vkQueueSubmit(): WRITE_AFTER_READ hazard detected. vkCmdBeginRenderPass (from VkCommandBuffer 0x14b824cf8 submitted on the current VkQueue 0x14a612b78) writes to resource, which was previously read by vkAcquireNextImageKHR.
+The current synchronization defines the destination stage mask as VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, but layout transition does not synchronize with these stages.
+Vulkan insight: If the layout transition is done via an image barrier, consider including VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT in srcStageMask. If the transition occurs as part of the render pass begin operation, consider specifying an external subpass dependency (VK_SUBPASS_EXTERNAL) with srcStageMask that includes VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, or perform the transition in a separate image barrier before the render pass begins.
+Vulkan insight: an execution dependency is sufficient to prevent this hazard.
+Objects: 2
+    [0] VkQueue 0x14a612b78
+    [1] VkCommandBuffer 0x14b824cf8
+
+[ERROR: Validation] - SYNC-HAZARD-WRITE-AFTER-READ
+vkQueueSubmit(): WRITE_AFTER_READ hazard detected. vkCmdBeginRenderPass (from VkCommandBuffer 0x14b824cf8 submitted on the current VkQueue 0x14a612b78) writes to resource, which was previously read by vkAcquireNextImageKHR.
+The current synchronization defines the destination stage mask as VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, but layout transition does not synchronize with these stages.
+Vulkan insight: If the layout transition is done via an image barrier, consider including VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT in srcStageMask. If the transition occurs as part of the render pass begin operation, consider specifying an external subpass dependency (VK_SUBPASS_EXTERNAL) with srcStageMask that includes VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, or perform the transition in a separate image barrier before the render pass begins.
+Vulkan insight: an execution dependency is sufficient to prevent this hazard.
+
+========== SHADOW PASS START (call #7) ==========
+Total models: 825
+Model 0: pos(-0.09, 1.00, -0.09) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+Validation Error: [ SYNC-HAZARD-READ-AFTER-WRITE ] | MessageID = 0xe4d96472
+vkCmdBeginRenderPass(): READ_AFTER_WRITE hazard detected: attachment loadOp access is not synchronized with the attachment layout transition. vkCmdBeginRenderPass reads the color aspect of attachment 0 in subpass 0 (VkImageView 0x70000000007, loadOp VK_ATTACHMENT_LOAD_OP_LOAD), which was previously written during an image layout transition initiated by the same command.
+The current synchronization allows VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT accesses at VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, but to prevent this hazard, it must allow VK_ACCESS_2_COLOR_ATTACHMENT_READ_BIT accesses at VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT.
+Objects: 1
+    [0] VkRenderPass 0xb000000000b
+
+[ERROR: Validation] - SYNC-HAZARD-READ-AFTER-WRITE
+vkCmdBeginRenderPass(): READ_AFTER_WRITE hazard detected: attachment loadOp access is not synchronized with the attachment layout transition. vkCmdBeginRenderPass reads the color aspect of attachment 0 in subpass 0 (VkImageView 0x70000000007, loadOp VK_ATTACHMENT_LOAD_OP_LOAD), which was previously written during an image layout transition initiated by the same command.
+The current synchronization allows VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT accesses at VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, but to prevent this hazard, it must allow VK_ACCESS_2_COLOR_ATTACHMENT_READ_BIT accesses at VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT.
+Validation Error: [ SYNC-HAZARD-WRITE-AFTER-READ ] | MessageID = 0x376bc9df
+vkQueueSubmit(): WRITE_AFTER_READ hazard detected. vkCmdBeginRenderPass (from VkCommandBuffer 0x14b824a78 submitted on the current VkQueue 0x14a612b78) writes to resource, which was previously read by vkAcquireNextImageKHR.
+The current synchronization defines the destination stage mask as VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, but layout transition does not synchronize with these stages.
+Vulkan insight: If the layout transition is done via an image barrier, consider including VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT in srcStageMask. If the transition occurs as part of the render pass begin operation, consider specifying an external subpass dependency (VK_SUBPASS_EXTERNAL) with srcStageMask that includes VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, or perform the transition in a separate image barrier before the render pass begins.
+Vulkan insight: an execution dependency is sufficient to prevent this hazard.
+Objects: 2
+    [0] VkQueue 0x14a612b78
+    [1] VkCommandBuffer 0x14b824a78
+
+[ERROR: Validation] - SYNC-HAZARD-WRITE-AFTER-READ
+vkQueueSubmit(): WRITE_AFTER_READ hazard detected. vkCmdBeginRenderPass (from VkCommandBuffer 0x14b824a78 submitted on the current VkQueue 0x14a612b78) writes to resource, which was previously read by vkAcquireNextImageKHR.
+The current synchronization defines the destination stage mask as VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, but layout transition does not synchronize with these stages.
+Vulkan insight: If the layout transition is done via an image barrier, consider including VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT in srcStageMask. If the transition occurs as part of the render pass begin operation, consider specifying an external subpass dependency (VK_SUBPASS_EXTERNAL) with srcStageMask that includes VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, or perform the transition in a separate image barrier before the render pass begins.
+Vulkan insight: an execution dependency is sufficient to prevent this hazard.
+
+========== SHADOW PASS START (call #8) ==========
+Total models: 825
+Model 0: pos(-0.10, 1.00, -0.10) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+Validation Error: [ SYNC-HAZARD-READ-AFTER-WRITE ] | MessageID = 0xe4d96472
+vkCmdBeginRenderPass(): READ_AFTER_WRITE hazard detected: attachment loadOp access is not synchronized with the attachment layout transition. vkCmdBeginRenderPass reads the color aspect of attachment 0 in subpass 0 (VkImageView 0x80000000008, loadOp VK_ATTACHMENT_LOAD_OP_LOAD), which was previously written during an image layout transition initiated by the same command.
+The current synchronization allows VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT accesses at VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, but to prevent this hazard, it must allow VK_ACCESS_2_COLOR_ATTACHMENT_READ_BIT accesses at VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT.
+Objects: 1
+    [0] VkRenderPass 0xb000000000b
+
+[ERROR: Validation] - SYNC-HAZARD-READ-AFTER-WRITE
+vkCmdBeginRenderPass(): READ_AFTER_WRITE hazard detected: attachment loadOp access is not synchronized with the attachment layout transition. vkCmdBeginRenderPass reads the color aspect of attachment 0 in subpass 0 (VkImageView 0x80000000008, loadOp VK_ATTACHMENT_LOAD_OP_LOAD), which was previously written during an image layout transition initiated by the same command.
+The current synchronization allows VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT accesses at VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, but to prevent this hazard, it must allow VK_ACCESS_2_COLOR_ATTACHMENT_READ_BIT accesses at VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT.
+Validation Error: [ SYNC-HAZARD-WRITE-AFTER-READ ] | MessageID = 0x376bc9df
+vkQueueSubmit(): WRITE_AFTER_READ hazard detected. vkCmdBeginRenderPass (from VkCommandBuffer 0x14b824bb8 submitted on the current VkQueue 0x14a612b78) writes to resource, which was previously read by vkAcquireNextImageKHR.
+The current synchronization defines the destination stage mask as VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, but layout transition does not synchronize with these stages.
+Vulkan insight: If the layout transition is done via an image barrier, consider including VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT in srcStageMask. If the transition occurs as part of the render pass begin operation, consider specifying an external subpass dependency (VK_SUBPASS_EXTERNAL) with srcStageMask that includes VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, or perform the transition in a separate image barrier before the render pass begins.
+Vulkan insight: an execution dependency is sufficient to prevent this hazard.
+Objects: 2
+    [0] VkQueue 0x14a612b78
+    [1] VkCommandBuffer 0x14b824bb8
+
+[ERROR: Validation] - SYNC-HAZARD-WRITE-AFTER-READ
+vkQueueSubmit(): WRITE_AFTER_READ hazard detected. vkCmdBeginRenderPass (from VkCommandBuffer 0x14b824bb8 submitted on the current VkQueue 0x14a612b78) writes to resource, which was previously read by vkAcquireNextImageKHR.
+The current synchronization defines the destination stage mask as VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, but layout transition does not synchronize with these stages.
+Vulkan insight: If the layout transition is done via an image barrier, consider including VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT in srcStageMask. If the transition occurs as part of the render pass begin operation, consider specifying an external subpass dependency (VK_SUBPASS_EXTERNAL) with srcStageMask that includes VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, or perform the transition in a separate image barrier before the render pass begins.
+Vulkan insight: an execution dependency is sufficient to prevent this hazard.
+
+========== SHADOW PASS START (call #9) ==========
+Total models: 825
+Model 0: pos(-0.11, 1.00, -0.11) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+Validation Error: [ SYNC-HAZARD-READ-AFTER-WRITE ] | MessageID = 0xe4d96472
+vkCmdBeginRenderPass(): READ_AFTER_WRITE hazard detected: attachment loadOp access is not synchronized with the attachment layout transition. vkCmdBeginRenderPass reads the color aspect of attachment 0 in subpass 0 (VkImageView 0x90000000009, loadOp VK_ATTACHMENT_LOAD_OP_LOAD), which was previously written during an image layout transition initiated by the same command.
+The current synchronization allows VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT accesses at VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, but to prevent this hazard, it must allow VK_ACCESS_2_COLOR_ATTACHMENT_READ_BIT accesses at VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT.
+Objects: 1
+    [0] VkRenderPass 0xb000000000b
+
+[ERROR: Validation] - SYNC-HAZARD-READ-AFTER-WRITE
+vkCmdBeginRenderPass(): READ_AFTER_WRITE hazard detected: attachment loadOp access is not synchronized with the attachment layout transition. vkCmdBeginRenderPass reads the color aspect of attachment 0 in subpass 0 (VkImageView 0x90000000009, loadOp VK_ATTACHMENT_LOAD_OP_LOAD), which was previously written during an image layout transition initiated by the same command.
+The current synchronization allows VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT accesses at VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, but to prevent this hazard, it must allow VK_ACCESS_2_COLOR_ATTACHMENT_READ_BIT accesses at VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT.
+Validation Error: [ SYNC-HAZARD-WRITE-AFTER-READ ] | MessageID = 0x376bc9df
+vkQueueSubmit(): WRITE_AFTER_READ hazard detected. vkCmdBeginRenderPass (from VkCommandBuffer 0x14b824cf8 submitted on the current VkQueue 0x14a612b78) writes to resource, which was previously read by vkAcquireNextImageKHR.
+The current synchronization defines the destination stage mask as VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, but layout transition does not synchronize with these stages.
+Vulkan insight: If the layout transition is done via an image barrier, consider including VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT in srcStageMask. If the transition occurs as part of the render pass begin operation, consider specifying an external subpass dependency (VK_SUBPASS_EXTERNAL) with srcStageMask that includes VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, or perform the transition in a separate image barrier before the render pass begins.
+Vulkan insight: an execution dependency is sufficient to prevent this hazard.
+Objects: 2
+    [0] VkQueue 0x14a612b78
+    [1] VkCommandBuffer 0x14b824cf8
+
+[ERROR: Validation] - SYNC-HAZARD-WRITE-AFTER-READ
+vkQueueSubmit(): WRITE_AFTER_READ hazard detected. vkCmdBeginRenderPass (from VkCommandBuffer 0x14b824cf8 submitted on the current VkQueue 0x14a612b78) writes to resource, which was previously read by vkAcquireNextImageKHR.
+The current synchronization defines the destination stage mask as VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, but layout transition does not synchronize with these stages.
+Vulkan insight: If the layout transition is done via an image barrier, consider including VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT in srcStageMask. If the transition occurs as part of the render pass begin operation, consider specifying an external subpass dependency (VK_SUBPASS_EXTERNAL) with srcStageMask that includes VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, or perform the transition in a separate image barrier before the render pass begins.
+Vulkan insight: an execution dependency is sufficient to prevent this hazard.
+
+========== SHADOW PASS START (call #10) ==========
+Total models: 825
+Model 0: pos(-0.12, 1.00, -0.12) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+Validation Error: [ SYNC-HAZARD-READ-AFTER-WRITE ] | MessageID = 0xe4d96472
+(Warning - This VUID has now been reported 10 times, which is the duplicated_message_limit value, this will be the last time reporting it).
+vkCmdBeginRenderPass(): READ_AFTER_WRITE hazard detected: attachment loadOp access is not synchronized with the attachment layout transition. vkCmdBeginRenderPass reads the color aspect of attachment 0 in subpass 0 (VkImageView 0x70000000007, loadOp VK_ATTACHMENT_LOAD_OP_LOAD), which was previously written during an image layout transition initiated by the same command.
+The current synchronization allows VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT accesses at VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, but to prevent this hazard, it must allow VK_ACCESS_2_COLOR_ATTACHMENT_READ_BIT accesses at VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT.
+Objects: 1
+    [0] VkRenderPass 0xb000000000b
+
+[ERROR: Validation] - SYNC-HAZARD-READ-AFTER-WRITE
+(Warning - This VUID has now been reported 10 times, which is the duplicated_message_limit value, this will be the last time reporting it).
+vkCmdBeginRenderPass(): READ_AFTER_WRITE hazard detected: attachment loadOp access is not synchronized with the attachment layout transition. vkCmdBeginRenderPass reads the color aspect of attachment 0 in subpass 0 (VkImageView 0x70000000007, loadOp VK_ATTACHMENT_LOAD_OP_LOAD), which was previously written during an image layout transition initiated by the same command.
+The current synchronization allows VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT accesses at VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, but to prevent this hazard, it must allow VK_ACCESS_2_COLOR_ATTACHMENT_READ_BIT accesses at VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT.
+Validation Error: [ SYNC-HAZARD-WRITE-AFTER-READ ] | MessageID = 0x376bc9df
+(Warning - This VUID has now been reported 10 times, which is the duplicated_message_limit value, this will be the last time reporting it).
+vkQueueSubmit(): WRITE_AFTER_READ hazard detected. vkCmdBeginRenderPass (from VkCommandBuffer 0x14b824a78 submitted on the current VkQueue 0x14a612b78) writes to resource, which was previously read by vkAcquireNextImageKHR.
+The current synchronization defines the destination stage mask as VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, but layout transition does not synchronize with these stages.
+Vulkan insight: If the layout transition is done via an image barrier, consider including VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT in srcStageMask. If the transition occurs as part of the render pass begin operation, consider specifying an external subpass dependency (VK_SUBPASS_EXTERNAL) with srcStageMask that includes VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, or perform the transition in a separate image barrier before the render pass begins.
+Vulkan insight: an execution dependency is sufficient to prevent this hazard.
+Objects: 2
+    [0] VkQueue 0x14a612b78
+    [1] VkCommandBuffer 0x14b824a78
+
+[ERROR: Validation] - SYNC-HAZARD-WRITE-AFTER-READ
+(Warning - This VUID has now been reported 10 times, which is the duplicated_message_limit value, this will be the last time reporting it).
+vkQueueSubmit(): WRITE_AFTER_READ hazard detected. vkCmdBeginRenderPass (from VkCommandBuffer 0x14b824a78 submitted on the current VkQueue 0x14a612b78) writes to resource, which was previously read by vkAcquireNextImageKHR.
+The current synchronization defines the destination stage mask as VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, but layout transition does not synchronize with these stages.
+Vulkan insight: If the layout transition is done via an image barrier, consider including VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT in srcStageMask. If the transition occurs as part of the render pass begin operation, consider specifying an external subpass dependency (VK_SUBPASS_EXTERNAL) with srcStageMask that includes VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT|VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT, or perform the transition in a separate image barrier before the render pass begins.
+Vulkan insight: an execution dependency is sufficient to prevent this hazard.
+
+========== SHADOW PASS START (call #11) ==========
+Total models: 825
+Model 0: pos(-0.13, 1.00, -0.13) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #12) ==========
+Total models: 825
+Model 0: pos(-0.15, 1.00, -0.14) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #13) ==========
+Total models: 825
+Model 0: pos(-0.16, 1.00, -0.16) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #14) ==========
+Total models: 825
+Model 0: pos(-0.17, 1.00, -0.17) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #15) ==========
+Total models: 825
+Model 0: pos(-0.19, 1.00, -0.18) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #16) ==========
+Total models: 825
+Model 0: pos(-0.20, 1.00, -0.19) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #17) ==========
+Total models: 825
+Model 0: pos(-0.21, 1.00, -0.20) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #18) ==========
+Total models: 825
+Model 0: pos(-0.23, 1.00, -0.22) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #19) ==========
+Total models: 825
+Model 0: pos(-0.25, 1.00, -0.24) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #20) ==========
+Total models: 825
+Model 0: pos(-0.26, 1.00, -0.25) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #21) ==========
+Total models: 825
+Model 0: pos(-0.28, 1.00, -0.26) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #22) ==========
+Total models: 825
+Model 0: pos(-0.29, 1.00, -0.27) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #23) ==========
+Total models: 825
+Model 0: pos(-0.30, 1.00, -0.28) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #24) ==========
+Total models: 825
+Model 0: pos(-0.32, 1.00, -0.29) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #25) ==========
+Total models: 825
+Model 0: pos(-0.33, 1.00, -0.30) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #26) ==========
+Total models: 825
+Model 0: pos(-0.34, 1.00, -0.31) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #27) ==========
+Total models: 825
+Model 0: pos(-0.35, 1.00, -0.32) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #28) ==========
+Total models: 825
+Model 0: pos(-0.38, 1.00, -0.34) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #29) ==========
+Total models: 825
+Model 0: pos(-0.39, 1.00, -0.34) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #30) ==========
+Total models: 825
+Model 0: pos(-0.40, 1.00, -0.35) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #31) ==========
+Total models: 825
+Model 0: pos(-0.42, 1.00, -0.36) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #32) ==========
+Total models: 825
+Model 0: pos(-0.43, 1.00, -0.37) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #33) ==========
+Total models: 825
+Model 0: pos(-0.45, 1.00, -0.38) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #34) ==========
+Total models: 825
+Model 0: pos(-0.46, 1.00, -0.39) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #35) ==========
+Total models: 825
+Model 0: pos(-0.48, 1.00, -0.40) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #36) ==========
+Total models: 825
+Model 0: pos(-0.50, 1.00, -0.41) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #37) ==========
+Total models: 825
+Model 0: pos(-0.51, 1.00, -0.42) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #38) ==========
+Total models: 825
+Model 0: pos(-0.53, 1.00, -0.43) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #39) ==========
+Total models: 825
+Model 0: pos(-0.55, 1.00, -0.44) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #40) ==========
+Total models: 825
+Model 0: pos(-0.57, 1.00, -0.45) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #41) ==========
+Total models: 825
+Model 0: pos(-0.59, 1.00, -0.46) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #42) ==========
+Total models: 825
+Model 0: pos(-0.60, 1.00, -0.46) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #43) ==========
+Total models: 825
+Model 0: pos(-0.62, 1.00, -0.47) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #44) ==========
+Total models: 825
+Model 0: pos(-0.64, 1.00, -0.48) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #45) ==========
+Total models: 825
+Model 0: pos(-0.66, 1.00, -0.48) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #46) ==========
+Total models: 825
+Model 0: pos(-0.68, 1.00, -0.49) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #47) ==========
+Total models: 825
+Model 0: pos(-0.70, 1.00, -0.50) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #48) ==========
+Total models: 825
+Model 0: pos(-0.72, 1.00, -0.50) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #49) ==========
+Total models: 825
+Model 0: pos(-0.74, 1.00, -0.51) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #50) ==========
+Total models: 825
+Model 0: pos(-0.76, 1.00, -0.51) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #51) ==========
+Total models: 825
+Model 0: pos(-0.78, 1.00, -0.52) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #52) ==========
+Total models: 825
+Model 0: pos(-0.80, 1.00, -0.52) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #53) ==========
+Total models: 825
+Model 0: pos(-0.82, 1.00, -0.52) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #54) ==========
+Total models: 825
+Model 0: pos(-0.84, 1.00, -0.53) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #55) ==========
+Total models: 825
+Model 0: pos(-0.86, 1.00, -0.53) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #56) ==========
+Total models: 825
+Model 0: pos(-0.88, 1.00, -0.53) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #57) ==========
+Total models: 825
+Model 0: pos(-0.90, 1.00, -0.53) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #58) ==========
+Total models: 825
+Model 0: pos(-0.93, 1.00, -0.53) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #59) ==========
+Total models: 825
+Model 0: pos(-0.95, 1.00, -0.53) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #60) ==========
+Total models: 825
+Model 0: pos(-0.97, 1.00, -0.53) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #61) ==========
+Total models: 825
+Model 0: pos(-0.99, 1.00, -0.53) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #62) ==========
+Total models: 825
+Model 0: pos(-1.01, 1.00, -0.52) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #63) ==========
+Total models: 825
+Model 0: pos(-1.05, 1.00, -0.52) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #64) ==========
+Total models: 825
+Model 0: pos(-1.06, 1.00, -0.51) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #65) ==========
+Total models: 825
+Model 0: pos(-1.08, 1.00, -0.51) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #66) ==========
+Total models: 825
+Model 0: pos(-1.10, 1.00, -0.51) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #67) ==========
+Total models: 825
+Model 0: pos(-1.12, 1.00, -0.50) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #68) ==========
+Total models: 825
+Model 0: pos(-1.15, 1.00, -0.49) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #69) ==========
+Total models: 825
+Model 0: pos(-1.17, 1.00, -0.48) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #70) ==========
+Total models: 825
+Model 0: pos(-1.19, 1.00, -0.47) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #71) ==========
+Total models: 825
+Model 0: pos(-1.21, 1.00, -0.46) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #72) ==========
+Total models: 825
+Model 0: pos(-1.23, 1.00, -0.45) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #73) ==========
+Total models: 825
+Model 0: pos(-1.25, 1.00, -0.44) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #74) ==========
+Total models: 825
+Model 0: pos(-1.27, 1.00, -0.43) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #75) ==========
+Total models: 825
+Model 0: pos(-1.29, 1.00, -0.41) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #76) ==========
+Total models: 825
+Model 0: pos(-1.31, 1.00, -0.40) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #77) ==========
+Total models: 825
+Model 0: pos(-1.33, 1.00, -0.38) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #78) ==========
+Total models: 825
+Model 0: pos(-1.34, 1.00, -0.37) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #79) ==========
+Total models: 825
+Model 0: pos(-1.36, 1.00, -0.35) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #80) ==========
+Total models: 825
+Model 0: pos(-1.38, 1.00, -0.33) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #81) ==========
+Total models: 825
+Model 0: pos(-1.39, 1.00, -0.31) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #82) ==========
+Total models: 825
+Model 0: pos(-1.41, 1.00, -0.29) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #83) ==========
+Total models: 825
+Model 0: pos(-1.42, 1.00, -0.27) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #84) ==========
+Total models: 825
+Model 0: pos(-1.43, 1.00, -0.25) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #85) ==========
+Total models: 825
+Model 0: pos(-1.45, 1.00, -0.23) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #86) ==========
+Total models: 825
+Model 0: pos(-1.46, 1.00, -0.21) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #87) ==========
+Total models: 825
+Model 0: pos(-1.46, 1.00, -0.19) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #88) ==========
+Total models: 825
+Model 0: pos(-1.47, 1.00, -0.16) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #89) ==========
+Total models: 825
+Model 0: pos(-1.48, 1.00, -0.14) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #90) ==========
+Total models: 825
+Model 0: pos(-1.49, 1.00, -0.11) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #91) ==========
+Total models: 825
+Model 0: pos(-1.49, 1.00, -0.09) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #92) ==========
+Total models: 825
+Model 0: pos(-1.50, 1.00, -0.06) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #93) ==========
+Total models: 825
+Model 0: pos(-1.50, 1.00, -0.04) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #94) ==========
+Total models: 825
+Model 0: pos(-1.50, 1.00, -0.01) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #95) ==========
+Total models: 825
+Model 0: pos(-1.50, 1.00, 0.01) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #96) ==========
+Total models: 825
+Model 0: pos(-1.50, 1.00, 0.03) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #97) ==========
+Total models: 825
+Model 0: pos(-1.50, 1.00, 0.06) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #98) ==========
+Total models: 825
+Model 0: pos(-1.49, 1.00, 0.08) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #99) ==========
+Total models: 825
+Model 0: pos(-1.49, 1.00, 0.11) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+
+
+========== SHADOW PASS START (call #100) ==========
+Total models: 825
+Model 0: pos(-1.48, 1.00, 0.13) indices=96 material_id=2
+Model 1: pos(-8.00, 0.00, 0.00) indices=36 material_id=6
+Model 2: pos(-8.00, 4.00, 0.00) indices=36 material_id=6
+Model 3: pos(-8.00, 1.00, 0.00) indices=36 material_id=6
+Model 4: pos(-5.00, 1.00, 0.00) indices=36 material_id=6
+Model 5: pos(-7.00, 1.00, 0.40) indices=12 material_id=8
+Model 6: pos(0.00, 8.00, 0.00) indices=12 material_id=3
+Model 7: pos(0.00, 0.00, 0.00) indices=36 material_id=1
+Model 8: pos(0.00, 1.00, 1.00) indices=36 material_id=0
+Model 9: pos(4.00, 1.00, 1.00) indices=36 material_id=0
+
+Summary: drawn=825, skipped_skybox=0, total=825
+========== SHADOW PASS END ==========
+

@@ -70,7 +70,7 @@ float calculate_pcf_shadow(vec4 light_space_pos) {
     float current_depth = shadow_position.z;
 
     // Bias для борьбы с shadow acne
-    float bias = 0.0001;
+    float bias = 0.002;
     current_depth = current_depth - bias;
 
     // Проверка: за пределами shadow map - нет тени

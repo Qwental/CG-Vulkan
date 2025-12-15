@@ -436,11 +436,30 @@ float toRadians(float degrees) {
 
 
 
-veekay::mat4 Transform::matrix() const {
-    // TODO: Scaling and rotation
-    auto t = veekay::mat4::translation(position);
-    return t;
+// veekay::mat4 Transform::matrix() const {
+//     // TODO: Scaling and rotation
+//     auto t = veekay::mat4::translation(position);
+//     return t;
+// }
+
+
+    veekay::mat4 Transform::matrix() const {
+    // 1. Translation matrix
+    veekay::mat4 translation = veekay::mat4::translation(position);
+
+    // 2. Scale matrix
+    veekay::mat4 scale_mat = veekay::mat4::identity();
+    scale_mat.elements[0][0] = scale.x;
+    scale_mat.elements[1][1] = scale.y;
+    scale_mat.elements[2][2] = scale.z;
+
+    // 3. Rotation matrices (если используешь rotation)
+    // Для базовой версии можно пропустить, если rotation = {0,0,0}
+
+    // 4. Combine: T * R * S (порядок важен!)
+    return translation * scale_mat;
 }
+
 
 veekay::mat4 Camera::view() const {
     // NOTE: Вычисляем базисные векторы камеры из pitch/yaw
@@ -1605,7 +1624,10 @@ void initialize(VkCommandBuffer cmd) {
                 .range = sizeof(SpotLightsBuffer),
             },
         };
-
+        VkDescriptorImageInfo shadow_image_info_desc{};
+        shadow_image_info_desc.sampler = shadow_sampler;
+        shadow_image_info_desc.imageView = shadow_map_view;
+        shadow_image_info_desc.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
         VkWriteDescriptorSet write_infos[] = {
             {
                 .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
@@ -1635,10 +1657,19 @@ void initialize(VkCommandBuffer cmd) {
                 .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
                 .pBufferInfo = &buffer_infos[2],
             },
+            {
+                .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+                .dstSet = descriptor_set,
+                .dstBinding = 3, // Shadow Map Binding
+                .dstArrayElement = 0,
+                .descriptorCount = 1,
+                .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+                .pImageInfo = &shadow_image_info_desc,
+            }
         };
 
-        vkUpdateDescriptorSets(device, std::size(write_infos),
-                             write_infos, 0, nullptr);
+        vkUpdateDescriptorSets(device, std::size(write_infos), write_infos, 0, nullptr);
+
     }
 
     // NOTE: Plane mesh initialization
@@ -2094,7 +2125,7 @@ models.clear();
     });
 
     // ============================================
-    // SKYBOX (рендерится первым, индекс 0)
+    // SKYBOX (рендерится первым, индекс 0) НУ его нахрен
     // ============================================
     models.emplace_back(Model{
         .mesh = skybox_mesh,
@@ -2554,29 +2585,69 @@ void update(double time) {
     }
 
     float aspect_ratio = float(veekay::app.window_width) / float(veekay::app.window_height);
-    // Вычисляем light space matrix для теней
-    veekay::vec3 scene_center = {0.0f, 0.0f, 0.0f};
+
+ static bool first_frame = true;
+
+    veekay::vec3 scene_min = {  9999.0f,  9999.0f,  9999.0f };
+    veekay::vec3 scene_max = { -9999.0f, -9999.0f, -9999.0f };
+
+    for (const Model& m : models) {
+        if (m.isSkybox) continue;
+
+        scene_min.x = std::min(scene_min.x, m.transform.position.x);
+        scene_min.y = std::min(scene_min.y, m.transform.position.y);
+        scene_min.z = std::min(scene_min.z, m.transform.position.z);
+
+        scene_max.x = std::max(scene_max.x, m.transform.position.x);
+        scene_max.y = std::max(scene_max.y, m.transform.position.y);
+        scene_max.z = std::max(scene_max.z, m.transform.position.z);
+    }
+
+    veekay::vec3 scene_center = {
+        (scene_min.x + scene_max.x) * 0.5f,
+        (scene_min.y + scene_max.y) * 0.5f,
+        (scene_min.z + scene_max.z) * 0.5f
+    };
+
+    float scene_radius = std::max({
+        scene_max.x - scene_min.x,
+        scene_max.y - scene_min.y,
+        scene_max.z - scene_min.z
+    }) * 0.5f * 1.2f;
+
+    if (first_frame) {
+        std::cout << "\n=== SCENE SETUP (first frame) ===" << std::endl;
+        std::cout << "Min: (" << scene_min.x << ", " << scene_min.y << ", " << scene_min.z << ")" << std::endl;
+        std::cout << "Max: (" << scene_max.x << ", " << scene_max.y << ", " << scene_max.z << ")" << std::endl;
+        std::cout << "Center: (" << scene_center.x << ", " << scene_center.y << ", " << scene_center.z << ")" << std::endl;
+        std::cout << "Radius: " << scene_radius << std::endl;
+        first_frame = false;
+    }
+
+    // Вычисление light matrix
     veekay::vec3 light_dir = normalize_vector(lighting_params.directional_direction);
-    veekay::vec3 light_pos = scene_center - light_dir * 20.0f;
+    float light_distance = scene_radius * 2.5f;
+    veekay::vec3 light_pos = scene_center + light_dir * light_distance;
 
     veekay::mat4 light_view = mat4_lookat(light_pos, scene_center, {0.0f, 1.0f, 0.0f});
-    // veekay::mat4 light_projection = mat4_ortho(-15.0f, 15.0f, -15.0f, 15.0f, 1.0f, 40.0f);
-    veekay::mat4 light_projection = mat4_ortho(-30.0f, 30.0f, -30.0f, 30.0f, 1.0f, 50.0f);
 
-    // veekay::mat4 light_space_matrix = light_projection * light_view ;
-     veekay::mat4 light_space_matrix =  light_view  * light_projection ;
+    float frustum_extent = scene_radius * 1.5f;
+    veekay::mat4 light_projection = mat4_ortho(
+        -frustum_extent,  frustum_extent,
+        -frustum_extent,  frustum_extent,
+         0.1f,            light_distance * 2.5f
+    );
 
-    global_light_space_matrix = light_space_matrix;
+    global_light_space_matrix = light_view * light_projection;
 
-    // NOTE: Заполняем SceneUniforms для текущего кадра
     SceneUniforms scene_uniforms{
-        .view_projection = camera.view_projection(aspect_ratio),
-        .view_position = camera.position,
-        .light_space_matrix = light_space_matrix,
+        .view_projection    = camera.view_projection(aspect_ratio),
+        .light_space_matrix = global_light_space_matrix,
+        .view_position      = camera.position,
         .ambient_light_intensity = lighting_params.ambient_color,
-        .sun_light_direction = normalize(lighting_params.directional_direction),
-        .sun_light_color = lighting_params.directional_color,
-        .spot_lights_count = 0,
+        .sun_light_direction     = normalize(lighting_params.directional_direction),
+        .sun_light_color         = lighting_params.directional_color,
+        .spot_lights_count       = 0,
     };
 
     // NOTE: Копируем в GPU буфер
@@ -2683,19 +2754,266 @@ void update(double time) {
 // ============================================
 // ФУНКЦИЯ: Рендеринг теней (Shadow Pass)
 // ============================================
+// void render_shadow_pass(VkCommandBuffer cmd) {
+//     // ============================================
+//     // ЛОГГИРОВАНИЕ: Начало shadow pass
+//     // ============================================
+//     std::cout << "\n========== SHADOW PASS START ==========" << std::endl;
+//     std::cout << "Total models: " << models.size() << std::endl;
+//
+//     // 1. Transition: UNDEFINED → DEPTH_ATTACHMENT
+//     transition_image_layout(cmd, shadow_map_image,
+//         shadow_map_current_layout,
+//         VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL);
+//     shadow_map_current_layout = VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL;
+//     std::cout << "Shadow map transitioned to DEPTH_ATTACHMENT_OPTIMAL" << std::endl;
+//
+//     // 2. Begin Dynamic Rendering
+//     VkRenderingAttachmentInfo depth_attachment{};
+//     depth_attachment.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
+//     depth_attachment.imageView = shadow_map_view;
+//     depth_attachment.imageLayout = VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL;
+//     depth_attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+//     depth_attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+//     depth_attachment.clearValue.depthStencil = {1.0f, 0};
+//
+//     VkRenderingInfo rendering_info{};
+//     rendering_info.sType = VK_STRUCTURE_TYPE_RENDERING_INFO;
+//     rendering_info.renderArea = {{0, 0}, {SHADOW_MAP_RESOLUTION, SHADOW_MAP_RESOLUTION}};
+//     rendering_info.layerCount = 1;
+//     rendering_info.colorAttachmentCount = 0;
+//     rendering_info.pColorAttachments = nullptr;
+//     rendering_info.pDepthAttachment = &depth_attachment;
+//
+//     dyn_vkCmdBeginRendering(cmd, &rendering_info);
+//     std::cout << "Dynamic rendering started (resolution: " << SHADOW_MAP_RESOLUTION << "x" << SHADOW_MAP_RESOLUTION << ")" << std::endl;
+//
+//     // 3. Bind shadow pipeline
+//     vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, shadow_pipeline);
+//     std::cout << "Shadow pipeline bound" << std::endl;
+//
+//     // 4. Set viewport and scissor
+//     VkViewport shadow_viewport{};
+//     shadow_viewport.x = 0.0f;
+//     shadow_viewport.y = 0.0f;
+//     shadow_viewport.width = (float)SHADOW_MAP_RESOLUTION;
+//     shadow_viewport.height = (float)SHADOW_MAP_RESOLUTION;
+//     shadow_viewport.minDepth = 0.0f;
+//     shadow_viewport.maxDepth = 1.0f;
+//     vkCmdSetViewport(cmd, 0, 1, &shadow_viewport);
+//
+//     VkRect2D shadow_scissor{};
+//     shadow_scissor.offset = {0, 0};
+//     shadow_scissor.extent = {SHADOW_MAP_RESOLUTION, SHADOW_MAP_RESOLUTION};
+//     vkCmdSetScissor(cmd, 0, 1, &shadow_scissor);
+//     std::cout << "Viewport & Scissor set" << std::endl;
+//
+//     // 5. Set depth bias
+//     // vkCmdSetDepthBias(cmd, 1.25f, 0.0f, 1.75f);
+//     // std::cout << "Depth bias set" << std::endl;
+//     vkCmdSetDepthBias(cmd, 0.0f, 0.0f, 0.0f);  // полностью отключить bias
+//
+//     // ============================================
+//     // 6. Рисуем все модели
+//     // ============================================
+//     struct ShadowPushConstants {
+//         veekay::mat4 light_space;
+//         veekay::mat4 model;
+//     };
+//
+//     std::cout << "\n--- Light Space Matrix ---" << std::endl;
+//     for (int row = 0; row < 4; row++) {
+//         std::cout << "[";
+//         for (int col = 0; col < 4; col++) {
+//             // ИСПРАВЛЕНО: elements[col][row] вместо [row][col]
+//             // Потому что mat4 хранится column-major (столбцы)
+//             std::cout << std::setw(8) << std::fixed << std::setprecision(3)
+//                       << global_light_space_matrix.elements[col][row];
+//             if (col < 3) std::cout << ", ";
+//         }
+//         std::cout << "]" << std::endl;
+//     }
+//     std::cout << std::endl;
+//
+//
+//     VkDeviceSize zero_offset = 0;
+//     size_t drawn_models = 0;
+//
+//     for (size_t i = 0; i < models.size(); i++) {
+//         const Model& model = models[i];
+//
+//         if (model.isSkybox) {
+//             std::cout << "Model " << i << ": SKIPPED (skybox)" << std::endl;
+//             continue;
+//         }
+//
+//         ShadowPushConstants constants{
+//             .light_space = global_light_space_matrix,
+//             .model = model.transform.matrix()
+//         };
+//
+//         vkCmdPushConstants(cmd, shadow_pipeline_layout,
+//             VK_SHADER_STAGE_VERTEX_BIT, 0,
+//             sizeof(ShadowPushConstants), &constants);
+//
+//         vkCmdBindVertexBuffers(cmd, 0, 1, &model.mesh.vertex_buffer->buffer, &zero_offset);
+//         vkCmdBindIndexBuffer(cmd, model.mesh.index_buffer->buffer, 0, VK_INDEX_TYPE_UINT32);
+//         vkCmdDrawIndexed(cmd, model.mesh.indices, 1, 0, 0, 0);
+//
+//         drawn_models++;
+//
+//         // Логгируем каждую модель
+//         std::cout << "Model " << i
+//                   << ": pos(" << model.transform.position.x << ", "
+//                               << model.transform.position.y << ", "
+//                               << model.transform.position.z << ")"
+//                   << " indices=" << model.mesh.indices
+//                   << " material_id=" << model.material_id
+//                   << std::endl;
+//     }
+//
+//     std::cout << "\nTotal drawn models: " << drawn_models << "/" << models.size() << std::endl;
+//
+//     // 7. End rendering
+//     dyn_vkCmdEndRendering(cmd);
+//     std::cout << "Dynamic rendering ended" << std::endl;
+//
+//     // 8. Transition: DEPTH_ATTACHMENT → SHADER_READ_ONLY
+//     transition_image_layout(cmd, shadow_map_image,
+//         VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL,
+//         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+//     shadow_map_current_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+//     std::cout << "Shadow map transitioned to SHADER_READ_ONLY_OPTIMAL" << std::endl;
+//
+//     std::cout << "========== SHADOW PASS END ==========\n" << std::endl;
+// }
+//
+//
+// void render(VkCommandBuffer cmd, VkFramebuffer framebuffer) {
+//
+//
+//     // vkResetCommandBuffer(cmd, 0);
+//
+//     // {
+//     //     VkCommandBufferBeginInfo info{
+//     //         .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+//     //         .flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT,
+//     //     };
+//     //     vkBeginCommandBuffer(cmd, &info);
+//     // }
+//
+//     {
+//         VkClearValue clear_color{.color = {{0.1f, 0.1f, 0.1f, 1.0f}}};
+//         VkClearValue clear_depth{.depthStencil = {1.0f, 0}};
+//         VkClearValue clear_values[] = {clear_color, clear_depth};
+//
+//         VkRenderPassBeginInfo info{
+//             .sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
+//             .renderPass = veekay::app.vk_render_pass,
+//             .framebuffer = framebuffer,
+//             .renderArea = {
+//                 .extent = {
+//                     veekay::app.window_width,
+//                     veekay::app.window_height
+//                 },
+//             },
+//             .clearValueCount = 2,
+//             .pClearValues = clear_values,
+//         };
+//         vkCmdBeginRenderPass(cmd, &info, VK_SUBPASS_CONTENTS_INLINE);
+//     }
+//
+//     vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
+//
+//     VkDeviceSize zero_offset = 0;
+//     VkBuffer current_vertex_buffer = VK_NULL_HANDLE;
+//     VkBuffer current_index_buffer = VK_NULL_HANDLE;
+//     const size_t model_uniforms_alignment =
+//         veekay::graphics::Buffer::structureAlignment(sizeof(ModelUniforms));
+//
+//     // ПЕРВЫЙ ПРОХОД: рендерим все объекты КРОМЕ скайбокса
+//     for (size_t i = 0, n = models.size(); i < n; ++i) {
+//         const Model& model = models[i];
+//
+//         // Пропускаем скайбокс
+//         if (model.isSkybox) continue;
+//
+//         const Mesh& mesh = model.mesh;
+//
+//         if (current_vertex_buffer != mesh.vertex_buffer->buffer) {
+//             current_vertex_buffer = mesh.vertex_buffer->buffer;
+//             vkCmdBindVertexBuffers(cmd, 0, 1, &current_vertex_buffer, &zero_offset);
+//         }
+//
+//         if (current_index_buffer != mesh.index_buffer->buffer) {
+//             current_index_buffer = mesh.index_buffer->buffer;
+//             vkCmdBindIndexBuffer(cmd, current_index_buffer, zero_offset, VK_INDEX_TYPE_UINT32);
+//         }
+//
+//         uint32_t offset = i * model_uniforms_alignment;
+//         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout,
+//                                 0, 1, &descriptor_set, 1, &offset);
+//
+//         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout,
+//                                 1, 1, &materials[model.material_id].descriptor_set, 0, nullptr);
+//
+//         vkCmdDrawIndexed(cmd, mesh.indices, 1, 0, 0, 0);
+//     }
+//
+//     // ВТОРОЙ ПРОХОД: рендерим скайбокс с depth test = LESS_OR_EQUAL и без depth write
+//     for (size_t i = 0, n = models.size(); i < n; ++i) {
+//         const Model& model = models[i];
+//
+//         // Рендерим ТОЛЬКО скайбокс
+//         if (!model.isSkybox) continue;
+//
+//         const Mesh& mesh = model.mesh;
+//
+//         if (current_vertex_buffer != mesh.vertex_buffer->buffer) {
+//             current_vertex_buffer = mesh.vertex_buffer->buffer;
+//             vkCmdBindVertexBuffers(cmd, 0, 1, &current_vertex_buffer, &zero_offset);
+//         }
+//
+//         if (current_index_buffer != mesh.index_buffer->buffer) {
+//             current_index_buffer = mesh.index_buffer->buffer;
+//             vkCmdBindIndexBuffer(cmd, current_index_buffer, zero_offset, VK_INDEX_TYPE_UINT32);
+//         }
+//
+//         uint32_t offset = i * model_uniforms_alignment;
+//         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout,
+//                                 0, 1, &descriptor_set, 1, &offset);
+//
+//         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout,
+//                                 1, 1, &materials[model.material_id].descriptor_set, 0, nullptr);
+//
+//         vkCmdDrawIndexed(cmd, mesh.indices, 1, 0, 0, 0);
+//     }
+//
+//     vkCmdEndRenderPass(cmd);
+//     // vkEndCommandBuffer(cmd);
+// }
+
+
+
+
+// ============================================
+// ФУНКЦИЯ: Рендеринг теней (Shadow Pass)
+// ============================================
 void render_shadow_pass(VkCommandBuffer cmd) {
-    // ============================================
-    // ЛОГГИРОВАНИЕ: Начало shadow pass
-    // ============================================
-    std::cout << "\n========== SHADOW PASS START ==========" << std::endl;
-    std::cout << "Total models: " << models.size() << std::endl;
+    static int call_count = 0;
+    const bool should_log = (call_count < 100);
+    call_count++;
+
+    if (should_log) {
+        std::cout << "\n========== SHADOW PASS START (call #" << call_count << ") ==========" << std::endl;
+        std::cout << "Total models: " << models.size() << std::endl;
+    }
 
     // 1. Transition: UNDEFINED → DEPTH_ATTACHMENT
     transition_image_layout(cmd, shadow_map_image,
         shadow_map_current_layout,
         VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL);
     shadow_map_current_layout = VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL;
-    std::cout << "Shadow map transitioned to DEPTH_ATTACHMENT_OPTIMAL" << std::endl;
 
     // 2. Begin Dynamic Rendering
     VkRenderingAttachmentInfo depth_attachment{};
@@ -2715,11 +3033,9 @@ void render_shadow_pass(VkCommandBuffer cmd) {
     rendering_info.pDepthAttachment = &depth_attachment;
 
     dyn_vkCmdBeginRendering(cmd, &rendering_info);
-    std::cout << "Dynamic rendering started (resolution: " << SHADOW_MAP_RESOLUTION << "x" << SHADOW_MAP_RESOLUTION << ")" << std::endl;
 
     // 3. Bind shadow pipeline
     vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, shadow_pipeline);
-    std::cout << "Shadow pipeline bound" << std::endl;
 
     // 4. Set viewport and scissor
     VkViewport shadow_viewport{};
@@ -2735,11 +3051,9 @@ void render_shadow_pass(VkCommandBuffer cmd) {
     shadow_scissor.offset = {0, 0};
     shadow_scissor.extent = {SHADOW_MAP_RESOLUTION, SHADOW_MAP_RESOLUTION};
     vkCmdSetScissor(cmd, 0, 1, &shadow_scissor);
-    std::cout << "Viewport & Scissor set" << std::endl;
 
-    // 5. Set depth bias
+    // 5. Set depth bias (отключен для диагностики)
     vkCmdSetDepthBias(cmd, 1.25f, 0.0f, 1.75f);
-    std::cout << "Depth bias set" << std::endl;
 
     // ============================================
     // 6. Рисуем все модели
@@ -2749,29 +3063,18 @@ void render_shadow_pass(VkCommandBuffer cmd) {
         veekay::mat4 model;
     };
 
-    std::cout << "\n--- Light Space Matrix ---" << std::endl;
-    for (int row = 0; row < 4; row++) {
-        std::cout << "[";
-        for (int col = 0; col < 4; col++) {
-            // ИСПРАВЛЕНО: elements[col][row] вместо [row][col]
-            // Потому что mat4 хранится column-major (столбцы)
-            std::cout << std::setw(8) << std::fixed << std::setprecision(3)
-                      << global_light_space_matrix.elements[col][row];
-            if (col < 3) std::cout << ", ";
-        }
-        std::cout << "]" << std::endl;
-    }
-    std::cout << std::endl;
-
-
     VkDeviceSize zero_offset = 0;
     size_t drawn_models = 0;
+    size_t skipped_skybox = 0;
 
     for (size_t i = 0; i < models.size(); i++) {
         const Model& model = models[i];
 
         if (model.isSkybox) {
-            std::cout << "Model " << i << ": SKIPPED (skybox)" << std::endl;
+            skipped_skybox++;
+            if (should_log && i < 5) {
+                std::cout << "Model " << i << ": SKIPPED (skybox)" << std::endl;
+            }
             continue;
         }
 
@@ -2790,80 +3093,107 @@ void render_shadow_pass(VkCommandBuffer cmd) {
 
         drawn_models++;
 
-        // Логгируем каждую модель
-        std::cout << "Model " << i
-                  << ": pos(" << model.transform.position.x << ", "
-                              << model.transform.position.y << ", "
-                              << model.transform.position.z << ")"
-                  << " indices=" << model.mesh.indices
-                  << " material_id=" << model.material_id
-                  << std::endl;
+        // Логгируем только первые 10 моделей
+        if (should_log && i < 10) {
+            std::cout << "Model " << i
+                      << ": pos(" << std::fixed << std::setprecision(2)
+                      << model.transform.position.x << ", "
+                      << model.transform.position.y << ", "
+                      << model.transform.position.z << ")"
+                      << " indices=" << model.mesh.indices
+                      << " material_id=" << model.material_id
+                      << std::endl;
+        }
     }
 
-    std::cout << "\nTotal drawn models: " << drawn_models << "/" << models.size() << std::endl;
+    if (should_log) {
+        std::cout << "\nSummary: drawn=" << drawn_models
+                  << ", skipped_skybox=" << skipped_skybox
+                  << ", total=" << models.size() << std::endl;
+    }
 
     // 7. End rendering
     dyn_vkCmdEndRendering(cmd);
-    std::cout << "Dynamic rendering ended" << std::endl;
 
     // 8. Transition: DEPTH_ATTACHMENT → SHADER_READ_ONLY
     transition_image_layout(cmd, shadow_map_image,
         VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL,
         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     shadow_map_current_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    std::cout << "Shadow map transitioned to SHADER_READ_ONLY_OPTIMAL" << std::endl;
 
-    std::cout << "========== SHADOW PASS END ==========\n" << std::endl;
+    if (should_log) {
+        std::cout << "========== SHADOW PASS END ==========\n" << std::endl;
+    }
 }
 
 
 void render(VkCommandBuffer cmd, VkFramebuffer framebuffer) {
+    // ============================================
+    // ЗАПОЛНЕНИЕ UNIFORMS
+    // ============================================
+    const float aspect_ratio =
+        static_cast<float>(veekay::app.window_width) /
+        static_cast<float>(veekay::app.window_height);
 
+    SceneUniforms scene_uniforms{
+        .view_projection         = camera.view_projection(aspect_ratio),
+        .light_space_matrix      = global_light_space_matrix,  // Уже вычислена в update()
+        .view_position           = camera.position,
+        .ambient_light_intensity = lighting_params.ambient_color,
+        .sun_light_direction     = normalize(lighting_params.directional_direction),
+        .sun_light_color         = lighting_params.directional_color,
+        .spot_lights_count       = 0,
+    };
 
-    // vkResetCommandBuffer(cmd, 0);
+    std::memcpy(scene_uniforms_buffer->mapped_region, &scene_uniforms, sizeof(SceneUniforms));
 
-    // {
-    //     VkCommandBufferBeginInfo info{
-    //         .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-    //         .flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT,
-    //     };
-    //     vkBeginCommandBuffer(cmd, &info);
-    // }
+    const size_t model_uniforms_alignment =
+        veekay::graphics::Buffer::structureAlignment(sizeof(ModelUniforms));
 
-    {
-        VkClearValue clear_color{.color = {{0.1f, 0.1f, 0.1f, 1.0f}}};
-        VkClearValue clear_depth{.depthStencil = {1.0f, 0}};
-        VkClearValue clear_values[] = {clear_color, clear_depth};
-
-        VkRenderPassBeginInfo info{
-            .sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
-            .renderPass = veekay::app.vk_render_pass,
-            .framebuffer = framebuffer,
-            .renderArea = {
-                .extent = {
-                    veekay::app.window_width,
-                    veekay::app.window_height
-                },
-            },
-            .clearValueCount = 2,
-            .pClearValues = clear_values,
+    for (size_t i = 0; i < models.size(); ++i) {
+        const Model& model = models[i];
+        ModelUniforms uniforms{
+            .model = model.transform.matrix(),
+            .albedo_color = model.albedo_color,
+            .specular_color = {0.5f, 0.5f, 0.5f},
+            .shininess = 32.0f,
         };
-        vkCmdBeginRenderPass(cmd, &info, VK_SUBPASS_CONTENTS_INLINE);
+
+        size_t offset = i * model_uniforms_alignment;
+        std::memcpy(
+            static_cast<char*>(model_uniforms_buffer->mapped_region) + offset,
+            &uniforms, sizeof(ModelUniforms)
+        );
     }
+
+    // ============================================
+    // НАЧАЛО RENDER PASS
+    // ============================================
+    VkClearValue clear_color{.color = {{0.1f, 0.1f, 0.1f, 1.0f}}};
+    VkClearValue clear_depth{.depthStencil = {1.0f, 0}};
+    VkClearValue clear_values[] = {clear_color, clear_depth};
+
+    VkRenderPassBeginInfo info{
+        .sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
+        .renderPass = veekay::app.vk_render_pass,
+        .framebuffer = framebuffer,
+        .renderArea = {
+            .extent = {veekay::app.window_width, veekay::app.window_height},
+        },
+        .clearValueCount = 2,
+        .pClearValues = clear_values,
+    };
+    vkCmdBeginRenderPass(cmd, &info, VK_SUBPASS_CONTENTS_INLINE);
 
     vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
 
     VkDeviceSize zero_offset = 0;
     VkBuffer current_vertex_buffer = VK_NULL_HANDLE;
     VkBuffer current_index_buffer = VK_NULL_HANDLE;
-    const size_t model_uniforms_alignment =
-        veekay::graphics::Buffer::structureAlignment(sizeof(ModelUniforms));
 
-    // ПЕРВЫЙ ПРОХОД: рендерим все объекты КРОМЕ скайбокса
+    // ПЕРВЫЙ ПРОХОД: обычные объекты
     for (size_t i = 0, n = models.size(); i < n; ++i) {
         const Model& model = models[i];
-
-        // Пропускаем скайбокс
         if (model.isSkybox) continue;
 
         const Mesh& mesh = model.mesh;
@@ -2888,11 +3218,9 @@ void render(VkCommandBuffer cmd, VkFramebuffer framebuffer) {
         vkCmdDrawIndexed(cmd, mesh.indices, 1, 0, 0, 0);
     }
 
-    // ВТОРОЙ ПРОХОД: рендерим скайбокс с depth test = LESS_OR_EQUAL и без depth write
+    // ВТОРОЙ ПРОХОД: скайбокс
     for (size_t i = 0, n = models.size(); i < n; ++i) {
         const Model& model = models[i];
-
-        // Рендерим ТОЛЬКО скайбокс
         if (!model.isSkybox) continue;
 
         const Mesh& mesh = model.mesh;
@@ -2918,8 +3246,9 @@ void render(VkCommandBuffer cmd, VkFramebuffer framebuffer) {
     }
 
     vkCmdEndRenderPass(cmd);
-    // vkEndCommandBuffer(cmd);
 }
+
+
 
 } // namespace
 
