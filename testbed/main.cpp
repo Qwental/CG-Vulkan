@@ -302,6 +302,10 @@ float toRadians(float degrees) {
     return degrees * static_cast<float>(M_PI) / 180.0f;
 }
 
+
+
+
+
 veekay::mat4 Transform::matrix() const {
     // TODO: Scaling and rotation
     auto t = veekay::mat4::translation(position);
