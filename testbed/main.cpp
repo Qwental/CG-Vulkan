@@ -543,7 +543,99 @@ Mesh createBox(float x_min, float y_min, float z_min,
 
     return mesh;
 }
+   // Функция для создания дерева Minecraft на заданной позиции
+void createMinecraftTree(float tree_x, float tree_y, float tree_z, size_t trunk_material_id, size_t leaves_material_id) {
+    // СТВОЛ ДЕРЕВА (4 блока высотой)
+    for (int i = 0; i < 4; i++) {
+        Mesh mesh = createBox(0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
+        models.emplace_back(Model{
+            .mesh = mesh,
+            .transform = Transform{.position = {tree_x, tree_y - i, tree_z}},
+            .albedo_color = {1.0f, 1.0f, 1.0f},
+            .material_id = trunk_material_id,  // Используем переданный ID
+        });
+    }
 
+    // ЛИСТВА - Слой 1 (y = 3)
+    int layer1_pattern[5][5] = {
+        {0, 0, 1, 0, 0},
+        {0, 1, 1, 1, 0},
+        {1, 1, 1, 1, 1},
+        {0, 1, 1, 1, 0},
+        {0, 0, 1, 0, 0}
+    };
+
+    for (int x = 0; x < 5; x++) {
+        for (int z = 0; z < 5; z++) {
+            if (layer1_pattern[z][x] == 1) {
+                Mesh mesh = createBox(0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
+                models.emplace_back(Model{
+                    .mesh = mesh,
+                    .transform = Transform{.position = {tree_x + x - 2.0f, tree_y - 3.0f, tree_z + z - 2.0f}},
+                    .albedo_color = {1.0f, 1.0f, 1.0f},
+                    .material_id = leaves_material_id,  // Используем переданный ID
+                });
+            }
+        }
+    }
+
+    // Слой 2 (y = 4) - полный квадрат 5x5
+    for (int x = 0; x < 5; x++) {
+        for (int z = 0; z < 5; z++) {
+            Mesh mesh = createBox(0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
+            models.emplace_back(Model{
+                .mesh = mesh,
+                .transform = Transform{.position = {tree_x + x - 2.0f, tree_y - 4.0f, tree_z + z - 2.0f}},
+                .albedo_color = {1.0f, 1.0f, 1.0f},
+                .material_id = leaves_material_id,
+            });
+        }
+    }
+
+    // Слой 3 (y = 5) - крестообразная форма
+    int layer3_pattern[5][5] = {
+        {0, 0, 1, 0, 0},
+        {0, 1, 1, 1, 0},
+        {1, 1, 1, 1, 1},
+        {0, 1, 1, 1, 0},
+        {0, 0, 1, 0, 0}
+    };
+
+    for (int x = 0; x < 5; x++) {
+        for (int z = 0; z < 5; z++) {
+            if (layer3_pattern[z][x] == 1) {
+                Mesh mesh = createBox(0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
+                models.emplace_back(Model{
+                    .mesh = mesh,
+                    .transform = Transform{.position = {tree_x + x - 2.0f, tree_y - 5.0f, tree_z + z - 2.0f}},
+                    .albedo_color = {1.0f, 1.0f, 1.0f},
+                    .material_id = leaves_material_id,
+                });
+            }
+        }
+    }
+
+    // Слой 4 (y = 6, верхушка) - маленький крест 3x3
+    int layer4_pattern[3][3] = {
+        {0, 1, 0},
+        {1, 1, 1},
+        {0, 1, 0}
+    };
+
+    for (int x = 0; x < 3; x++) {
+        for (int z = 0; z < 3; z++) {
+            if (layer4_pattern[z][x] == 1) {
+                Mesh mesh = createBox(0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
+                models.emplace_back(Model{
+                    .mesh = mesh,
+                    .transform = Transform{.position = {tree_x + x - 1.0f, tree_y - 6.0f, tree_z + z - 1.0f}},
+                    .albedo_color = {1.0f, 1.0f, 1.0f},
+                    .material_id = leaves_material_id,
+                });
+            }
+        }
+    }
+}
 
 
 void initialize(VkCommandBuffer cmd) {
@@ -1017,12 +1109,12 @@ void initialize(VkCommandBuffer cmd) {
     size_t glowstone_material_id = materials.size() - 1;
     std::cout << "Glowstone material ID: " << glowstone_material_id << std::endl;
 
-    // 8. Magma (магма/лава)
-    materials.push_back(createMaterial(cmd, device, "assets/magma.png",
+    // 8. ЛИСТВА
+    materials.push_back(createMaterial(cmd, device, "assets/листва.png",
                                        descriptor_pool, texture_descriptor_layout,
                                        texture_sampler));
-    size_t magma_material_id = materials.size() - 1;
-    std::cout << "Magma material ID: " << magma_material_id << std::endl;
+    size_t leaves_material_id = materials.size() - 1;
+    std::cout << "leaves_material_id material ID: " << leaves_material_id << std::endl;
 
     // 9. Water (вода)
     materials.push_back(createMaterial(cmd, device, "assets/water.png",
@@ -1594,15 +1686,15 @@ Mesh pillar_mesh;
         .albedo_color = veekay::vec3{1.0f, 1.0f, 1.0f}
     });
 
-    // NOTE: КУБА
-    models.emplace_back(Model{
-        .mesh = cube_mesh,
-        .transform = Transform{
-            .position = {2.0f, -0.5f, 0.0f},
-            .scale = {0.8f, 0.8f, 0.8f},
-        },
-        .albedo_color = veekay::vec3{0.9f, 0.2f, 0.2f}
-    });
+    // // NOTE: КУБА
+    // models.emplace_back(Model{
+    //     .mesh = cube_mesh,
+    //     .transform = Transform{
+    //         .position = {2.0f, -0.5f, 0.0f},
+    //         .scale = {0.8f, 0.8f, 0.8f},
+    //     },
+    //     .albedo_color = veekay::vec3{0.9f, 0.2f, 0.2f}
+    // });
 
     // NOTE: ЦИЛИНДР
     models.emplace_back(Model{
@@ -1647,16 +1739,7 @@ models.clear();
 
 
 
-    // КУБИК С ПРОЖЕКТОРОМ (возвращаем обратно)
-    models.emplace_back(Model{
-        .mesh = cube_mesh,
-        .transform = Transform{
-            .position = {2.0f, -0.5f, 0.0f},
-            .scale = {0.8f, 0.8f, 0.8f},
-        },
-        .albedo_color = {0.9f, 0.2f, 0.2f},
-        .material_id = grass_material_id  // Или любой другой материал
-    });
+
 
     // Позиция портала в мире (поднят на 1 блок выше)
     float portal_x = -8.0f;
@@ -1843,9 +1926,67 @@ models.clear();
     });
 }
 
+    // Параметры надписи
+    float text_start_x = -18.0f;  // Начальная позиция X
+    float text_start_y = -8.0f;    // Y-координата (на уровне земли)
+    float text_start_z = 10.0f;  // Z-координата (сдвиг назад, чтобы не пересекаться)
+    float block_size = 1.0f;      // Размер одного блока
+
+    // Паттерн надписи MINECRAFT (5 строк × 37 колонок)
+    // 1 = cobblestone, 0 = пустота
+    int pattern[5][37] = {
+        {1,0,0,0,1,0,1,0,1,0,0,0,1,0,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1},
+        {1,1,0,1,1,0,1,0,1,1,0,0,1,0,1,0,0,0,1,0,0,0,1,0,1,0,1,0,1,0,1,0,0,0,0,1,0},
+        {1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,1,0,0,1,0,0,0,1,1,0,0,1,1,1,0,1,1,0,0,0,1,0},
+        {1,0,0,0,1,0,1,0,1,0,0,1,1,0,1,0,0,0,1,0,0,0,1,0,1,0,1,0,1,0,1,0,0,0,0,1,0},
+        {1,0,0,0,1,0,1,0,1,0,0,0,1,0,1,1,1,0,1,1,1,0,1,0,1,0,1,0,1,0,1,0,0,0,0,1,0}
+    };
+
+    // Создаем блоки cobblestone по паттерну
+    for (int row = 0; row < 5; row++) {
+        for (int col = 0; col < 37; col++) {
+            if (pattern[row][col] == 1) {
+                // Создаем блок 1x1x1
+                Mesh mesh = createBox(0.0f, 0.0f, 0.0f, block_size, block_size, block_size);
+
+                // Вычисляем позицию блока
+                float x = text_start_x + col * block_size;
+                float y = text_start_y + row * block_size;
+                float z = text_start_z;
+
+                models.emplace_back(Model{
+                    .mesh = mesh,
+                    .transform = Transform{.position = {x, y, z}},
+                    .albedo_color = {1.0f, 1.0f, 1.0f},
+                    .material_id = cobblestone_material_id,
+                });
+            }
+        }
+    }
+
+    // Создаём деревья с передачей material ID
+    createMinecraftTree(10.0f, 5.0f, -5.0f, oak_material_id, leaves_material_id);
+    createMinecraftTree(15.0f, 5.0f, 0.0f, oak_material_id, leaves_material_id);
+    createMinecraftTree(-10.0f, 5.0f, -10.0f, oak_material_id, leaves_material_id);
 
 
+    // ===== 8 НОВЫХ ДЕРЕВЬЕВ =====
+    // Группа справа (положительный X)
+    createMinecraftTree(18.0f, 5.0f, -8.0f, oak_material_id, leaves_material_id);   // Дерево 4 - дальний правый угол
+    createMinecraftTree(20.0f, 5.0f, 5.0f, oak_material_id, leaves_material_id);    // Дерево 5 - правый передний
+    createMinecraftTree(12.0f, 5.0f, 8.0f, oak_material_id, leaves_material_id);    // Дерево 6 - ближе к центру справа
 
+    // Группа слева (отрицательный X)
+    createMinecraftTree(-15.0f, 5.0f, -5.0f, oak_material_id, leaves_material_id);  // Дерево 7 - левый средний
+    createMinecraftTree(-18.0f, 5.0f, 5.0f, oak_material_id, leaves_material_id);   // Дерево 8 - левый передний
+    createMinecraftTree(-12.0f, 5.0f, -15.0f, oak_material_id, leaves_material_id); // Дерево 9 - левый задний
+
+    // Группа сзади (отрицательный Z)
+    createMinecraftTree(5.0f, 5.0f, -15.0f, oak_material_id, leaves_material_id);   // Дерево 10 - задний центр
+    createMinecraftTree(-5.0f, 5.0f, -18.0f, oak_material_id, leaves_material_id);  // Дерево 11 - дальний задний
+
+    // Дополнительные деревья по краям
+    createMinecraftTree(8.0f, 5.0f, 12.0f, oak_material_id, leaves_material_id);    // Дерево 12 - передний правый
 }
 
 // NOTE: Destroy resources here
@@ -2033,7 +2174,7 @@ void update(double time) {
         .ambient_light_intensity = lighting_params.ambient_color,
         .sun_light_direction = normalize(lighting_params.directional_direction),
         .sun_light_color = lighting_params.directional_color,
-        .spot_lights_count = 1,
+        .spot_lights_count = 0,
     };
 
     // NOTE: Копируем в GPU буфер

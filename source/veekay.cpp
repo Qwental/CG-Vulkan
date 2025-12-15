@@ -8,7 +8,7 @@
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
-
+#include <vulkan/vulkan.h>
 #include <VkBootstrap.h>
 
 #include <imgui.h>
@@ -123,7 +123,7 @@ int veekay::run(const veekay::ApplicationInfo& app_info) {
 	{ // NOTE: Initialize Vulkan: grab device and create swapchain
 		vkb::InstanceBuilder instance_builder;
 
-		auto builder_result = instance_builder.require_api_version(1, 2, 0)
+		auto builder_result = instance_builder.require_api_version(1, 3, 0)
 		                                      .request_validation_layers()
 		                                      .use_default_debug_messenger()
 		                                      .build();
@@ -162,6 +162,10 @@ int veekay::run(const veekay::ApplicationInfo& app_info) {
 
 		{
 			vkb::DeviceBuilder device_builder(physical_device);
+			VkPhysicalDeviceDynamicRenderingFeatures dynamic_rendering_features{};
+			dynamic_rendering_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES;
+			dynamic_rendering_features.dynamicRendering = VK_TRUE;
+			device_builder.add_pNext(&dynamic_rendering_features);
 
 			auto result = device_builder.build();
 
@@ -778,7 +782,6 @@ int veekay::run(const veekay::ApplicationInfo& app_info) {
 	vkFreeMemory(vk_device, vk_image_depth_memory, nullptr);
 	vkDestroyImage(vk_device, vk_image_depth, nullptr);
 
-
 	vkDestroyCommandPool(vk_device, imgui_command_pool, nullptr);
 	vkDestroyRenderPass(vk_device, imgui_render_pass, nullptr);
 
@@ -791,7 +794,6 @@ int veekay::run(const veekay::ApplicationInfo& app_info) {
 	ImGui_ImplVulkan_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
-
 
 	vkDestroyDescriptorPool(vk_device, imgui_descriptor_pool, nullptr);
 
