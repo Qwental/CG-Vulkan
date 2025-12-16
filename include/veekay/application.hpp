@@ -21,7 +21,8 @@ namespace veekay {
     };
 
     struct ApplicationInfo {
-        InitFunc init;
+        InitFunc
+        init;
         ShutdownFunc shutdown;
         UpdateFunc update;
         RenderFunc render;

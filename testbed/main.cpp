@@ -190,7 +190,7 @@ inline namespace {
         .pitch = 30.0f,
         .yaw = 0.0f
     };
-
+    bool camera_follows_sun = false;
     std::vector<Model> models;
 }
 
@@ -243,7 +243,7 @@ inline namespace {
 
 
     // ===== SHADOW MAPPING =====
-    constexpr uint32_t SHADOW_MAP_RESOLUTION = 4096;
+    constexpr uint32_t SHADOW_MAP_RESOLUTION = 8192;
     VkImage shadow_map_image = VK_NULL_HANDLE;
     VkDeviceMemory shadow_map_memory = VK_NULL_HANDLE;
     VkImageView shadow_map_view = VK_NULL_HANDLE;
@@ -1885,7 +1885,7 @@ Mesh wall_mesh;
     // NOTE: Ground plane mesh - большой квадрат травы ниже пола
     Mesh ground_mesh;
     {
-        float ground_size = 50.0f;  // Размер поляны (50x50)
+        float ground_size = 75.0f;  // Размер поляны (50x50)
         float ground_height = 1.0f; // Высота блока
         float ground_y = -2.0f;     // Ниже пола (floor на y=-2.0f)
 
@@ -2081,11 +2081,11 @@ Mesh pillar_mesh;
 
 
     // NOTE: Add models to scene
-    models.emplace_back(Model{
-        .mesh = plane_mesh,
-        .transform = Transform{.position = {0.0f, 3.0f, 0.0f}},
-        .albedo_color = veekay::vec3{1.0f, 1.0f, 1.0f}
-    });
+    // models.emplace_back(Model{
+    //     .mesh = plane_mesh,
+    //     .transform = Transform{.position = {0.0f, 3.0f, 0.0f}},
+    //     .albedo_color = veekay::vec3{1.0f, 1.0f, 1.0f}
+    // });
 
     // // NOTE: КУБА
     // models.emplace_back(Model{
@@ -2098,26 +2098,24 @@ Mesh pillar_mesh;
     // });
 
     // NOTE: ЦИЛИНДР
-    models.emplace_back(Model{
-        .mesh = cylinder_mesh,
-        .transform = Transform{
-            .position = {0.0f, -0.0f, 0.0f},
-        },
-        .albedo_color = veekay::vec3{0.8f, 0.8f, 0.8f}
-    });
+    // models.emplace_back(Model{
+    //     .mesh = cylinder_mesh,
+    //     .transform = Transform{
+    //         .position = {30.0f, -0.0f, 0.0f},
+    //     },
+    //     .albedo_color = veekay::vec3{0.8f, 0.8f, 0.8f}
+    // });
 // ============================================
 // СОЗДАНИЕ МОДЕЛЕЙ
 // ============================================
 
 models.clear();
 
-    // ============================================
-    // ЦИЛИНДР (как было раньше) - с текстурой Lenna
-    // ============================================
+
     models.emplace_back(Model{
         .mesh = cylinder_mesh,
         .transform = Transform{
-            .position = {-3.0f, 1.0f, 0.0f},  // Слева от дома
+            .position = {-30.0f, 1.0f, 33.0f},  // Слева от дома
             .rotation = {0.0f, 0.0f, 0.0f}
         },
         .albedo_color = {1.0f, 1.0f, 1.0f},
@@ -2125,7 +2123,7 @@ models.clear();
     });
 
     // ============================================
-    // SKYBOX (рендерится первым, индекс 0) НУ его нахрен
+    // SKYBOX (рендерится первым, индекс 0)
     // ============================================
     models.emplace_back(Model{
         .mesh = skybox_mesh,
@@ -2494,6 +2492,13 @@ void update(double time) {
         animation_direction *= -1;
     }
 
+    ImGui::Checkbox("Animation paused", &animation_paused);
+    ImGui::Checkbox("Follow sun", &camera_follows_sun);
+
+    if (ImGui::Button("EXIT")) {
+        veekay::app.running = false;
+    }
+
     // NOTE: КАТЕГОРИЯ: Ambient свет
     ImGui::SeparatorText("Ambient Light");
     ImGui::ColorEdit3("Ambient Color##amb", (float*)&lighting_params.ambient_color);
@@ -2537,7 +2542,7 @@ void update(double time) {
     // НОВОЕ: Применяем позицию к ЦИЛИНДРУ (индекс 0)
     // ============================================
     if (models.size() > cylinder_model_index) {
-        models[cylinder_model_index].transform.position = {x, 1.0f, z};  // Y=1 чтобы был над полом
+        models[cylinder_model_index].transform.position = {x + 20.0f, 4.0f, z+ 20.0f};
 
         // NOTE: Self-rotation цилиндра вокруг оси Y
         models[cylinder_model_index].transform.rotation.y += 0.5f;  // Градусов за кадр
@@ -2557,6 +2562,26 @@ void update(double time) {
             if (camera.pitch < -89.0f) camera.pitch = -89.0f;
 
             CameraBasis basis = compute_camera_basis(camera.pitch, camera.yaw);
+
+
+            if (camera_follows_sun) {
+                veekay::vec3 sun_direction = normalize(lighting_params.directional_direction);
+                veekay::vec3 center = {0.0f, 0.0f, 0.0f};
+veekay::vec3 sun_position = sun_direction * 30.0f;
+                camera.position = sun_position;
+                veekay::vec3 to_center = center - camera.position;
+                to_center = normalize(to_center);
+                camera.pitch = -asinf(to_center.y) * 180.0f / M_PI;
+                camera.yaw = atan2f(to_center.z, to_center.x) * 180.0f / M_PI;
+            }
+
+
+
+
+
+
+
+
 
             veekay::vec3 forward = basis.forward;
             veekay::vec3 right = basis.right;
@@ -2581,6 +2606,7 @@ void update(double time) {
 
             if (keyboard::isKeyDown(keyboard::Key::z))
                 camera.position -= up * camera_speed;
+
         }
     }
 
@@ -3052,7 +3078,6 @@ void render_shadow_pass(VkCommandBuffer cmd) {
     shadow_scissor.extent = {SHADOW_MAP_RESOLUTION, SHADOW_MAP_RESOLUTION};
     vkCmdSetScissor(cmd, 0, 1, &shadow_scissor);
 
-    // 5. Set depth bias (отключен для диагностики)
     vkCmdSetDepthBias(cmd, 1.25f, 0.0f, 1.75f);
 
     // ============================================
