@@ -242,6 +242,9 @@ inline namespace {
 
 
 
+
+
+
     // ===== SHADOW MAPPING =====
     constexpr uint32_t SHADOW_MAP_RESOLUTION = 8192;
     VkImage shadow_map_image = VK_NULL_HANDLE;
