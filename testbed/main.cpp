@@ -124,7 +124,7 @@ struct ModelUniforms {
     // NOTE: Параметр блеска (shininess из Лекции-5)
     // Чем больше, тем острее блик (типично 16-128)
     float shininess;
-    float _pad2;
+    float is_skybox;
     float _pad3;
     float _pad4;
 };
@@ -2708,7 +2708,7 @@ void update(double time) {
 
         // NOTE: Диффузный цвет (альбедо)
         uniforms.albedo_color = model.albedo_color;
-        uniforms._pad2 = model.isSkybox ? 1.0f : 0.0f;
+        uniforms.is_skybox = model.isSkybox ? 1.0f : 0.0f;
 
 
         // ============================================
@@ -3125,8 +3125,6 @@ void render_shadow_pass(VkCommandBuffer cmd) {
         std::cout << "========== SHADOW PASS END ==========\n" << std::endl;
     }
 }
-
-
 void render(VkCommandBuffer cmd, VkFramebuffer framebuffer) {
     // ============================================
     // ЗАПОЛНЕНИЕ UNIFORMS
@@ -3137,7 +3135,7 @@ void render(VkCommandBuffer cmd, VkFramebuffer framebuffer) {
 
     SceneUniforms scene_uniforms{
         .view_projection         = camera.view_projection(aspect_ratio),
-        .light_space_matrix      = global_light_space_matrix,  // Уже вычислена в update()
+        .light_space_matrix      = global_light_space_matrix,
         .view_position           = camera.position,
         .ambient_light_intensity = lighting_params.ambient_color,
         .sun_light_direction     = normalize(lighting_params.directional_direction),
@@ -3157,6 +3155,7 @@ void render(VkCommandBuffer cmd, VkFramebuffer framebuffer) {
             .albedo_color = model.albedo_color,
             .specular_color = {0.5f, 0.5f, 0.5f},
             .shininess = 32.0f,
+            .is_skybox = model.isSkybox ? 1.0f : 0.0f,  // ✅ ИСПРАВЛЕНО
         };
 
         size_t offset = i * model_uniforms_alignment;

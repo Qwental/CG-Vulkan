@@ -54,8 +54,9 @@ layout (binding = 2, std140) uniform SpotLightsBuffer {
 layout (set = 1, binding = 0) uniform sampler2D albedo_texture;
 layout (set = 1, binding = 1) uniform sampler2D specular_texture;
 layout (set = 1, binding = 2) uniform sampler2D emissive_texture;
+
 // Shadow map в set = 0 (глобальные данные)
-layout (set = 0, binding = 3) uniform sampler2D shadow_texture;  // ИСПРАВЛЕНО
+layout (set = 0, binding = 3) uniform sampler2D shadow_texture;
 
 
 // ФУНКЦИЯ: PCF Shadow Calculation
